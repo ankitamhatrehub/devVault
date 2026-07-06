@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import path from "path";
-
+import { logger } from "../config/logger";
 // Load environment variables from .env file (from project root)
 dotenv.config({ path: path.resolve(".env") });
 
@@ -16,9 +16,9 @@ export const connectDB = async () => {
     }
 
     await mongoose.connect(mongoUrl);
-    console.log("✅ MongoDB Connected Successfully");
+    logger.info("✅ MongoDB Connected Successfully");
   } catch (error) {
-    console.error("❌ MongoDB Connection Failed:", error);
+    logger.error("❌ MongoDB Connection Failed:", error);
     process.exit(1);
   }
 };

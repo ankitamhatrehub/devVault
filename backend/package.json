@@ -21,8 +21,8 @@
     "express-validator": "^7.0.0",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
-    "logger": "^0.0.1",
-    "mongoose": "^7.0.0"
+    "mongoose": "^7.0.0",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
