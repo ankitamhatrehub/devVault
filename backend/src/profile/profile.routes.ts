@@ -5,7 +5,7 @@ import { getProfileController, updateProfileController,changePasword } from "./p
 import { authMiddleware } from "../middleware/auth.middleware";
 const router = Router();
 
-router.get("/get", authMiddleware, getProfileController);
-router.put("/edit", authMiddleware, updateProfileController);
+router.get("/getProfile", authMiddleware, getProfileController);
+router.put("/editProfile", authMiddleware, updateProfileController);
 router.put("/change-password", authMiddleware, changePasword);
 export default router;

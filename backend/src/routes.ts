@@ -4,7 +4,7 @@
 
 import { Router } from "express";
 import auth from "../src/authentication/auth.routes";
-// import users from "../src/users/users.routes";
+import profile from "../src/profile/profile.routes";
 // import tasks from "../src/tasks/tasks.routes";
 // import notes from "../src/notes/notes.routes";
 // import projects from "../src/projects/projects.routes";
@@ -58,7 +58,7 @@ router.use("/auth", auth);
 // router.use("/tasks", tasks);
 // router.use("/notes", notes);
 // router.use("/projects", projects);
-// router.use("/users", users);
+router.use("/profile", profile);
 
 // ========== EXPORTS ==========
 
