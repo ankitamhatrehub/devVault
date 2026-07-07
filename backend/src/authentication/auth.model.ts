@@ -16,6 +16,30 @@ const AuthSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    bio: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    designation: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    experience: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    currentComapny: {
+      type: String,
+      trim: true,
+    },
+    location: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
   {
     timestamps: true,

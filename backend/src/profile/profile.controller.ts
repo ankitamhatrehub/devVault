@@ -40,8 +40,16 @@ export const getProfileController = async (req: Request, res: Response) => {
 export const updateProfileController = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const { name, email } = req.body;
-    const userUpdate = await updateprofileService(userId, { name, email });
+    const { name, email,bio,designation,experience,currentCompany,location } = req.body;
+    const userUpdate = await updateprofileService(userId, {
+      name,
+      email,
+      bio,
+      designation,
+      experience,
+      currentCompany,
+      location,
+    });
     logger.info("usser updated data => " + userUpdate);
     return res.status(200).json({
       success: true,

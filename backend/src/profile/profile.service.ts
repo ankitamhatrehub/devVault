@@ -6,7 +6,22 @@ export const getprofileService = async (userId: string) => {
 };
 export const updateprofileService = async (
   userId: string,
-  updateData: { name: string; email: string },
+  updateData: {
+    name: string;
+    email: string;
+    bio?: String;
+    designation: String;
+    experience: String;
+    currentCompany?: String;
+    location: String;
+  },
+  // name,
+  // email,
+  // bio,
+  // designation,
+  // experience,
+  // currentCompany,
+  // location,
 ) => {
   try {
     logger.info(

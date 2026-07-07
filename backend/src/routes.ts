@@ -10,6 +10,7 @@ import notes from "../src/notes/notes.routes";
 import projects from "../src/projects/projects.routes";
 // import interview from "../src/interview/interview.routes";
 import learning from "../src/learning/learning.routes";
+import dashboard from "../src/dashboard/dashboard.route";
 // Create a new Express router instance for handling API routes
 const router = Router();
 
@@ -20,6 +21,7 @@ router.use("/tasks", tasks);
 router.use("/notes", notes);
 router.use("/projects", projects);
 router.use("/profile", profile);
+router.use("/dashboard", dashboard);
 
 // ========== EXPORTS ==========
 
