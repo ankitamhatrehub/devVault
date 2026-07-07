@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-
+import { logger } from "../config/logger";
 export const authMiddleware = (
   req: Request,
   res: Response,
@@ -9,7 +9,9 @@ export const authMiddleware = (
   try {
     // Step 1: Read Authorization header
     const authHeader = req.headers.authorization;
-
+    logger.info("authHeader is => " + authHeader);
+    logger.info("request header is " + req.headers);
+    logger.info(JSON.stringify(req.headers, null, 2));
     // Step 2: Check if header exists
     if (!authHeader) {
       return res.status(401).json({
@@ -35,9 +37,11 @@ export const authMiddleware = (
         message: "Token not found in authorization header",
       });
     }
+    logger.info("token is " + token);
+    logger.info("jwt secret is " + process.env.JWT_SECRET!);
     // Step 5: Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-
+    logger.info(decoded);
     // Step 6: Attach decoded user to request
     (req as any).user = decoded;
 
@@ -50,9 +54,6 @@ export const authMiddleware = (
     });
   }
 };
-
-
-
 
 //how to use
 // import { authMiddleware } from "../middleware/auth.middleware";

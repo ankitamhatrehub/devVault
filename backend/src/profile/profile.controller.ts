@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import logger from "logger";
+import { logger } from "../config/logger";
 import {
   getprofileService,
   updateprofileService,
@@ -8,15 +8,17 @@ import {
 
 export const getProfileController = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = (req as any).user.userId;
+    logger.info("User  is this => " + userId);
     const user = await getprofileService(userId);
     if (!user) {
-      // logger.("User not found");
+      logger.error("User not found");
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
+    logger.info("profile details fetch successfully");
     return res.status(200).json({
       success: true,
       message: "profile details fetch successfully",
@@ -37,9 +39,10 @@ export const getProfileController = async (req: Request, res: Response) => {
 
 export const updateProfileController = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = (req as any).user.userId;
     const { name, email } = req.body;
     const userUpdate = await updateprofileService(userId, { name, email });
+    logger.info("usser updated data => " + userUpdate);
     return res.status(200).json({
       success: true,
       message: "profile details updated successfully",

@@ -1,6 +1,7 @@
 import AuthSchema from "./auth.model";
 import bcrypt from "bcryptjs";
 import jsonWebToken from "jsonwebtoken";
+import { logger } from "../config/logger";
 export const registerService = async (
   name: string,
   email: string,
@@ -37,7 +38,6 @@ export const registerService = async (
       email: newUser.email,
       createdAt: newUser.createdAt,
     },
-   
   };
 };
 
@@ -47,9 +47,15 @@ export const loginService = async (email: string, password: string) => {
     throw new Error("Please fill all details");
   }
   const user = await AuthSchema.findOne({ email });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
   const oldpass = await bcrypt.compare(password, user!.password);
   if (!oldpass) {
-    throw new Error("Password is not match");
+    logger.error("Invalid email or password");
+    // throw new Error("Password is not match");
+    throw new Error("Invalid email or password");
   }
 
   const token = await jsonWebToken.sign(

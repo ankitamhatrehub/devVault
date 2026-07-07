@@ -5,7 +5,7 @@ export const registerController = async (req: Request, res: Response) => {
     const { name, email, password, confirmPassword } = req.body;
 
     // Call registration service
-    const { user, token } = await registerService(
+    const { user } = await registerService(
       name,
       email,
       password,
@@ -18,7 +18,6 @@ export const registerController = async (req: Request, res: Response) => {
       message: "User registered successfully",
       data: {
         user,
-        accessToken: token,
       },
     });
   } catch (error: any) {
@@ -50,7 +49,7 @@ export const loginController = async (req: Request, res: Response) => {
         success: false,
       });
     }
-      const { user, token } = await loginService(email, password);
+    const { user, token } = await loginService(email, password);
     res.status(201).json({
       success: true,
       message: "User LoggedIn successfully",

@@ -1,11 +1,13 @@
 import 'package:go_router/go_router.dart';
 
 import '../../features/authentication/presentation/pages/login_screen.dart';
+import '../../data/models/profile_model.dart';
 import '../../features/interview/presentation/pages/interview_questions_screen.dart';
 import '../../features/learning/presentation/pages/resources_screen.dart';
 import '../../features/main_shell/presentation/pages/main_shell.dart';
 import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/onboarding/presentation/pages/splash_screen.dart';
+import '../../features/profile/presentation/pages/edit_profile_screen.dart';
 import '../../features/tasks/presentation/pages/tasks_screen.dart';
 
 class Routes {
@@ -26,6 +28,7 @@ class Routes {
   static const tasks = '/tasks';
   static const learning = '/learning';
   static const profile = '/profile';
+  static const editProfile = '/edit-profile';
   static const resources = '/resources';
   static const interviewQuestions = '/interview-questions';
   static const mainShell = '/main-shell';
@@ -111,6 +114,22 @@ class AppRouter {
         path: Routes.profile,
         name: 'profile',
         builder: (context, state) => const MainShell(initialIndex: 4),
+      ),
+      GoRoute(
+        path: Routes.editProfile,
+        name: 'editProfile',
+        builder: (context, state) {
+          final profile = state.extra as Map<String, dynamic>?;
+          return EditProfileScreen(
+            profile: profile != null
+                ? ProfileModel(
+                    id: profile['id']?.toString() ?? '',
+                    name: profile['name']?.toString() ?? '',
+                    email: profile['email']?.toString() ?? '',
+                  )
+                : ProfileModel(id: '', name: '', email: ''),
+          );
+        },
       ),
       GoRoute(
         path: Routes.resources,
