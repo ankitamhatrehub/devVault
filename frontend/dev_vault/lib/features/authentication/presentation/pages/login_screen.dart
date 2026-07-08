@@ -1,3 +1,5 @@
+import 'package:dev_vault/features/authentication/presentation/widgets/login_form.dart';
+import 'package:dev_vault/features/authentication/presentation/widgets/register_form.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
