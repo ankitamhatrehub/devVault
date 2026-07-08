@@ -135,10 +135,10 @@ class _SignupFormState extends State<SignupForm> {
       if (mounted) {
         if (result['success'] == true) {
           _showSuccessSnackBar(result['message'] ?? 'Registration successful');
-          // Navigate to success page or login
+          // Navigate directly to login screen
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
-              context.go(Routes.success);
+              context.go(Routes.login);
             }
           });
         } else {
