@@ -18,17 +18,17 @@ const AuthSchema = new mongoose.Schema(
     },
     bio: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
     },
     designation: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
     },
     experience: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
     },
     currentComapny: {
@@ -37,7 +37,7 @@ const AuthSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
     },
   },
