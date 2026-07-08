@@ -59,22 +59,40 @@ class ProfileService {
   }
 
   /// Update user profile
-  /// Takes name and email as parameters
+  /// Takes all profile fields as parameters
   /// Returns updated ProfileModel
   /// Throws Exception on failure
   static Future<ProfileModel> updateProfile({
     required String name,
     required String email,
+    String? bio,
+    String? designation,
+    String? experience,
+    String? currentCompany,
+    String? location,
   }) async {
     try {
       print('📡 Updating profile at: $editProfileUrl');
       print('   Name: $name');
       print('   Email: $email');
+      print('   Bio: $bio');
+      print('   Designation: $designation');
+      print('   Experience: $experience');
+      print('   Company: $currentCompany');
+      print('   Location: $location');
       print('🔑 Using stored token for authentication');
 
       final response = await _dio.put(
         editProfileUrl,
-        data: {'name': name, 'email': email},
+        data: {
+          'name': name,
+          'email': email,
+          'bio': bio ?? '',
+          'designation': designation ?? '',
+          'experience': experience ?? '',
+          'currentComapny': currentCompany ?? '',
+          'location': location ?? '',
+        },
         options: Options(headers: _getAuthHeaders()),
       );
 

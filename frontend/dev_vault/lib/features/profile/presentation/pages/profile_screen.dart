@@ -97,15 +97,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         IconButton(
                           onPressed: () async {
+                            if (profile == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Profile data not loaded'),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                              return;
+                            }
+                            print('✏️ Opening edit profile with full data');
+                            print('   Profile ID: ${profile.id}');
+                            print('   Profile Name: ${profile.name}');
+                            print('   Profile Email: ${profile.email}');
+
                             final result = await context.push<bool?>(
                               Routes.editProfile,
-                              extra: {
-                                'id': profile?.id ?? '',
-                                'name': profile?.name ?? '',
-                                'email': profile?.email ?? '',
-                              },
+                              extra: profile,
                             );
                             if (result == true) {
+                              print('🔄 Reloading profile after edit');
                               await _loadProfile();
                             }
                           },
@@ -118,6 +129,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _ProfileSection(
                       title: 'Account',
                       children: [
+                        ListTile(
+                          leading: const Icon(Icons.file_present_rounded),
+                          title: const Text('CV/Resume'),
+                          subtitle: const Text('Upload your CV'),
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('CV upload coming soon'),
+                              ),
+                            );
+                          },
+                        ),
                         ListTile(
                           enabled: false,
                           leading: const Icon(Icons.settings_outlined),
