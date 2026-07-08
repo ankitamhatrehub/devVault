@@ -115,22 +115,22 @@ class AppRouter {
         name: 'profile',
         builder: (context, state) => const MainShell(initialIndex: 4),
       ),
-      GoRoute(
-        path: Routes.editProfile,
-        name: 'editProfile',
-        builder: (context, state) {
-          final profile = state.extra as Map<String, dynamic>?;
-          return EditProfileScreen(
-            profile: profile != null
-                ? ProfileModel(
-                    id: profile['id']?.toString() ?? '',
-                    name: profile['name']?.toString() ?? '',
-                    email: profile['email']?.toString() ?? '',
-                  )
-                : ProfileModel(id: '', name: '', email: ''),
-          );
-        },
-      ),
+      // GoRoute(
+      //   path: Routes.editProfile,
+      //   name: 'editProfile',
+      //   builder: (context, state) {
+      //     final profile = state.extra as Map<String, dynamic>?;
+      //     return EditProfileScreen(
+      //       profile: profile != null
+      //           ? ProfileModel(
+      //               id: profile['id']?.toString() ?? '',
+      //               name: profile['name']?.toString() ?? '',
+      //               email: profile['email']?.toString() ?? '',
+      //             )
+      //           : ProfileModel(id: '', name: '', email: ''),
+      //     );
+      //   },
+      // ),
       GoRoute(
         path: Routes.resources,
         name: 'resources',
