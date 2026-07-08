@@ -13,30 +13,38 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final ProfileService _profileService = ProfileService();
   ProfileModel? _profile;
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    print('👤 ProfileScreen initialized');
     _loadProfile();
   }
 
   Future<void> _loadProfile() async {
     try {
-      final profile = await _profileService.getProfile();
+      print('📡 Loading user profile...');
+      final profile = await ProfileService.getProfile();
       if (!mounted) return;
+      print('✅ Profile loaded successfully');
       setState(() {
         _profile = profile;
         _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
+      print('❌ Error loading profile: $e');
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Unable to load profile: $e')));
+      ).showSnackBar(
+        SnackBar(
+          content: Text('Unable to load profile: $e'),
+          backgroundColor: Colors.red.shade600,
+        ),
+      );
     }
   }
 

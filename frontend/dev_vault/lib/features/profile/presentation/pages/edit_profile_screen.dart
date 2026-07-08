@@ -17,12 +17,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   final _formKey = GlobalKey<FormState>();
-  final _service = ProfileService();
   bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
+    print('✏️ EditProfileScreen initialized');
+    print('   Current Name: ${widget.profile.name}');
+    print('   Current Email: ${widget.profile.email}');
     _nameController = TextEditingController(text: widget.profile.name);
     _emailController = TextEditingController(text: widget.profile.email);
   }
@@ -35,25 +37,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      print('❌ Form validation failed');
+      return;
+    }
 
+    print('💾 Saving profile changes...');
     setState(() => _isSaving = true);
 
     try {
-      await _service.updateProfile(
+      await ProfileService.updateProfile(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
       );
+
       if (!mounted) return;
+
+      print('✅ Profile saved successfully');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully')),
+        SnackBar(
+          content: const Text('Profile updated successfully'),
+          backgroundColor: Colors.green.shade600,
+        ),
       );
+
+      // Return true to indicate successful update
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to update profile: $e')));
+      print('❌ Error updating profile: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update profile: $e'),
+          backgroundColor: Colors.red.shade600,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
