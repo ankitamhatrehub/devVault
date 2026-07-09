@@ -1,35 +1,8 @@
+import 'package:dev_vault/data/models/projects_model.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../widgets/widgets.dart';
-
-class ProjectItem {
-  const ProjectItem({
-    required this.id,
-    required this.name,
-    required this.summary,
-    required this.status,
-    required this.progress,
-    required this.stack,
-    required this.deadline,
-    required this.team,
-    required this.tags,
-    required this.updatedAt,
-    required this.notes,
-  });
-
-  final String id;
-  final String name;
-  final String summary;
-  final String status;
-  final double progress;
-  final String stack;
-  final String deadline;
-  final String team;
-  final List<String> tags;
-  final String updatedAt;
-  final String notes;
-}
 
 class ProjectDetailScreen extends StatelessWidget {
   const ProjectDetailScreen({
@@ -39,8 +12,8 @@ class ProjectDetailScreen extends StatelessWidget {
     required this.onDelete,
   });
 
-  final ProjectItem project;
-  final ValueChanged<ProjectItem> onEdit;
+  final ProjectsModel project;
+final ValueChanged<ProjectsModel> onEdit;
   final ValueChanged<String> onDelete;
 
   @override
@@ -75,7 +48,7 @@ class ProjectDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      project.name,
+                      project.projectName,
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
                     const SizedBox(height: AppSpacing.xs),
@@ -99,7 +72,13 @@ class ProjectDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          project.updatedAt,
+                        project.updatedAt != null
+    ? project.updatedAt!
+          .toLocal()
+          .toString()
+          .split('.')
+          .first
+    : '-',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -113,9 +92,9 @@ class ProjectDetailScreen extends StatelessWidget {
               DetailCard(
                 child: Column(
                   children: [
-                    InfoRow(label: 'Stack', value: project.stack),
+                    InfoRow(label: 'Stack', value: project.primaryStack),
                     InfoRow(label: 'Deadline', value: project.deadline),
-                    InfoRow(label: 'Team', value: project.team),
+                    InfoRow(label: 'Team', value: project.teamSize),
                   ],
                 ),
               ),
@@ -128,14 +107,14 @@ class ProjectDetailScreen extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(child: Text('Progress')),
-                        Text('${(project.progress * 100).round()}%'),
+Text('${project.progress}%')
                       ],
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                       child: LinearProgressIndicator(
-                        value: project.progress,
+                        value: project.progress/100,
                         minHeight: 8,
                       ),
                     ),
@@ -161,7 +140,7 @@ class ProjectDetailScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.lg),
               Text('Notes', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
-              DetailCard(child: Text(project.notes)),
+              DetailCard(child: Text(project.projectNotes)),
               const SizedBox(height: AppSpacing.lg),
               Text(
                 'Attachments',
@@ -210,7 +189,7 @@ class ProjectDetailScreen extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('Delete project?'),
         content: Text(
-          'This will remove ${project.name} from your active workspace.',
+          'This will remove ${project.projectName} from your active workspace.',
         ),
         actions: [
           TextButton(
@@ -223,7 +202,7 @@ class ProjectDetailScreen extends StatelessWidget {
               onDelete(project.id);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${project.name} deleted successfully'),
+                  content: Text('${project.projectName} deleted successfully'),
                   backgroundColor: Colors.orange,
                   duration: const Duration(seconds: 2),
                 ),

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dev_vault/data/models/projects_model.dart';
+import 'package:dev_vault/data/services/projects_service.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../widgets/widgets.dart';
@@ -17,103 +19,87 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  late List<ProjectItem> _projects;
+  List<ProjectsModel> _projects = [];
 
   @override
   void initState() {
     super.initState();
-    _projects = [
-      const ProjectItem(
-        id: 'p1',
-        name: 'DevVault',
-        summary: 'A calm workspace for developer growth, learning, and delivery.',
-        status: 'In review',
-        progress: 0.82,
-        stack: 'Flutter • GoRouter',
-        deadline: '2026-07-18',
-        team: '3 members',
-        tags: ['Flutter', 'Product', 'Design'],
-        updatedAt: 'Updated 2h ago',
-        notes: 'Keep the onboarding flow polished before shipping.',
-      ),
-      const ProjectItem(
-        id: 'p2',
-        name: 'Expense Tracker',
-        summary: 'An intelligent expense planner with smart categories and alerts.',
-        status: 'Shipping soon',
-        progress: 0.61,
-        stack: 'Flutter • Firebase',
-        deadline: '2026-07-28',
-        team: '2 members',
-        tags: ['Firebase', 'Charts'],
-        updatedAt: 'Updated yesterday',
-        notes: 'Review the chart density before the beta release.',
-      ),
-      const ProjectItem(
-        id: 'p3',
-        name: 'Student Management',
-        summary: 'A cross-functional platform for enrolment, advising, and reports.',
-        status: 'Planning',
-        progress: 0.34,
-        stack: 'Node.js • MongoDB',
-        deadline: '2026-08-10',
-        team: '4 members',
-        tags: ['Back-end', 'Reports'],
-        updatedAt: 'Updated 3 days ago',
-        notes: 'Outline the admin workflows before implementation.',
-      ),
-    ];
-    unawaited(_loadProjects());
+    _loadProjects();
   }
 
   Future<void> _loadProjects() async {
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+    try {
+      setState(() => _isLoading = true);
+
+      final projects = await ProjectsService.getAllProjects();
+
+      if (!mounted) return;
+
+      setState(() {
+        _projects = projects;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() => _isLoading = false);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   Future<void> _refreshProjects() async {
-    setState(() => _isLoading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+    await _loadProjects();
   }
 
-  void _addProject(ProjectItem project) {
+  void _addProject(ProjectsModel project) {
     setState(() {
       _projects.insert(0, project);
       _isLoading = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${project.name} created successfully!'),
+        content: Text('${project.projectName} created successfully!'),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
-  void _updateProject(ProjectItem updatedProject) {
+  void _updateProject(ProjectsModel updatedProject) {
     setState(() {
-      final index = _projects.indexWhere((item) => item.id == updatedProject.id);
+      final index = _projects.indexWhere(
+        (item) => item.id == updatedProject.id,
+      );
       if (index >= 0) {
         _projects[index] = updatedProject;
       }
     });
   }
 
-  void _deleteProject(String id) {
-    final removed = _projects.firstWhere((item) => item.id == id);
-    setState(() => _projects.removeWhere((item) => item.id == id));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${removed.name} removed from your workspace.'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () => setState(() => _projects.insert(0, removed)),
+  Future<void> _deleteProject(String id) async {
+    try {
+      await ProjectsService.deleteProject(id);
+
+      await _loadProjects();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Project deleted successfully"),
+          backgroundColor: AppColors.success,
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
@@ -126,9 +112,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget build(BuildContext context) {
     final filteredProjects = _projects.where((project) {
       final query = _searchQuery.toLowerCase();
-      return project.name.toLowerCase().contains(query) ||
-          project.stack.toLowerCase().contains(query) ||
-          project.tags.any((tag) => tag.toLowerCase().contains(query));
+      return project.projectName.toLowerCase().contains(query) ||
+          project.primaryStack.toLowerCase().contains(query) ||
+          project.focusTags.any((tag) => tag.toLowerCase().contains(query));
     }).toList();
 
     return Scaffold(
@@ -150,13 +136,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Projects', style: Theme.of(context).textTheme.headlineLarge),
+                        Text(
+                          'Projects',
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           'Keep delivery, ideas, and product momentum in one calm workspace.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -201,15 +189,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                 itemBuilder: (context, index) {
                                   final project = filteredProjects[index];
                                   return InkWell(
-                                    borderRadius: BorderRadius.circular(AppRadius.medium),
-                                    onTap: () => _openProjectDetail(context, project),
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadius.medium,
+                                    ),
+                                    onTap: () =>
+                                        _openProjectDetail(context, project),
                                     child: ProjectTile(
-                                      name: project.name,
+                                      name: project.projectName,
                                       status: project.status,
-                                      stack: project.stack,
-                                      progress: project.progress,
+                                      stack: project.primaryStack,
+                                      progress: project.progress / 100,
                                       deadline: project.deadline,
-                                      onTap: () => _openProjectDetail(context, project),
+                                      onTap: () =>
+                                          _openProjectDetail(context, project),
                                     ),
                                   );
                                 },
@@ -227,7 +219,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.large)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppRadius.large),
+        ),
       ),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -235,7 +229,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Sort & filter', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Sort & filter',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: AppSpacing.md),
             Wrap(
               spacing: AppSpacing.sm,
@@ -259,54 +256,53 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
-  Future<void> _openProjectDetail(BuildContext context, ProjectItem project) async {
+  Future<void> _openProjectDetail(
+    BuildContext context,
+    ProjectsModel project,
+  ) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (context) => ProjectDetailScreen(
           project: project,
-          onEdit: (updatedProject) async {
-            final result = await Navigator.of(context).push<ProjectItem?>(
-              MaterialPageRoute<ProjectItem?>(
-                builder: (context) => ProjectFormScreen(
-                  project: updatedProject,
-                  onSave: (savedProject) {
-                    _updateProject(savedProject);
-                    Navigator.of(context).pop(savedProject);
-                  },
-                ),
-              ),
-            );
-            if (result != null) {
-              _updateProject(result);
-            }
+          onEdit: (project) async {
+            await _openProjectForm(context, project: project);
           },
-          onDelete: (id) {
-            _deleteProject(id);
-            Navigator.of(context).pop();
+          onDelete: (id) async {
+            await _deleteProject(id);
+
+            if (!mounted) return;
+
+            Navigator.pop(context);
           },
         ),
       ),
     );
   }
 
-  Future<void> _openProjectForm(BuildContext context, {ProjectItem? project}) async {
-    final result = await Navigator.of(context).push<ProjectItem?>(
-      MaterialPageRoute<ProjectItem?>(
-        builder: (context) => ProjectFormScreen(
-          project: project,
-          onSave: (savedProject) {
-            if (project == null) {
-              _addProject(savedProject);
-            } else {
-              _updateProject(savedProject);
-            }
-            Navigator.of(context).pop(savedProject);
-          },
-        ),
-      ),
+  Future<void> _openProjectForm(
+    BuildContext context, {
+    ProjectsModel? project,
+  }) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => ProjectFormScreen(project: project)),
     );
-    if (result != null && project == null) {
-      _addProject(result);
+
+    if (result == true) {
+      await _loadProjects();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            project == null
+                ? "Project created successfully"
+                : "Project updated successfully",
+          ),
+          backgroundColor: AppColors.success,
+        ),
+      );
     }
   }
 }

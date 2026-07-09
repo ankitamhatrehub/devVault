@@ -1,13 +1,14 @@
+import 'package:dev_vault/data/models/projects_model.dart';
+import 'package:dev_vault/data/services/projects_service.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
-import 'project_detail_screen.dart';
 
 class ProjectFormScreen extends StatefulWidget {
-  const ProjectFormScreen({super.key, this.project, required this.onSave});
+  const ProjectFormScreen({super.key, this.project, });
 
-  final ProjectItem? project;
-  final ValueChanged<ProjectItem> onSave;
+  final ProjectsModel? project;
+
 
   @override
   State<ProjectFormScreen> createState() => _ProjectFormScreenState();
@@ -38,19 +39,19 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.project?.name ?? '');
+    _nameController = TextEditingController(text: widget.project?.projectName ?? '');
     _summaryController = TextEditingController(
       text: widget.project?.summary ?? '',
     );
     _deadlineController = TextEditingController(
       text: widget.project?.deadline ?? '',
     );
-    _notesController = TextEditingController(text: widget.project?.notes ?? '');
+    _notesController = TextEditingController(text: widget.project?.projectNotes ?? '');
     _status = widget.project?.status ?? 'In review';
-    _stack = widget.project?.stack.split(' • ').first ?? 'Flutter';
-    _team = widget.project?.team ?? '3 members';
-    _progress = widget.project?.progress ?? 0.5;
-    _selectedTags.addAll(widget.project?.tags ?? <String>[]);
+    _stack = widget.project?.primaryStack.split(' • ').first ?? 'Flutter';
+    _team = widget.project?.teamSize ?? '3 members';
+    _progress = (widget.project?.progress ?? 50) / 100;
+    _selectedTags.addAll(widget.project?.focusTags ?? <String>[]);
   }
 
   @override
@@ -76,40 +77,48 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
       });
     }
   }
-
-  void _save() {
+Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    final project = ProjectItem(
-      id: widget.project?.id ??
-          DateTime.now().microsecondsSinceEpoch.toString(),
-      name: _nameController.text.trim(),
-      summary: _summaryController.text.trim(),
-      status: _status,
-      progress: _progress,
-      stack: _stack,
-      deadline: _deadlineController.text.trim(),
-      team: _team,
-      tags: _selectedTags,
-      updatedAt: 'Just now',
-      notes: _notesController.text.trim(),
-    );
 
-    // ✅ Success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          widget.project == null
-              ? 'Project "${project.name}" created successfully!'
-              : 'Project "${project.name}" updated successfully!',
-        ),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    try {
+      if (widget.project == null) {
+        await ProjectsService.createProject(
+          projectName: _nameController.text.trim(),
+          summary: _summaryController.text.trim(),
+          primaryStack: _stack,
+          status: _status,
+          deadline: _deadlineController.text.trim(),
+          teamSize: _team,
+          projectNotes: _notesController.text.trim(),
+          focusTags: _selectedTags,
+          progress: (_progress * 100).round(),
+        );
+      } else {
+        await ProjectsService.updateProject(
+          id: widget.project!.id,
+          projectName: _nameController.text.trim(),
+          summary: _summaryController.text.trim(),
+          primaryStack: _stack,
+          status: _status,
+          deadline: _deadlineController.text.trim(),
+          teamSize: _team,
+          projectNotes: _notesController.text.trim(),
+          focusTags: _selectedTags,
+          progress: (_progress * 100).round(),
+        );
+      }
 
-    widget.onSave(project);
+      if (!mounted) return;
+
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
