@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/widgets.dart';
 import '../../../notes/presentation/pages/note_form_screen.dart';
 import '../../../projects/presentation/widgets/project_tile.dart';
 import '../widgets/dashboard_widgets.dart';
@@ -171,11 +170,7 @@ Future<bool> _showExitDialog(BuildContext context) async {
 void _openNoteForm(BuildContext context) {
   Navigator.of(context).push<void>(
     MaterialPageRoute<void>(
-      builder: (context) => NoteFormScreen(
-        onSave: (savedNote) {
-          Navigator.of(context).pop();
-        },
-      ),
+      builder: (context) => NoteFormScreen(),
     ),
   );
 }

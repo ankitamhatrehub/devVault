@@ -1,14 +1,16 @@
+import 'package:dev_vault/data/models/notes_model.dart';
+import 'package:dev_vault/data/services/notes_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
-import 'notes_screen.dart';
+
 
 class NoteFormScreen extends StatefulWidget {
-  const NoteFormScreen({super.key, this.note, required this.onSave});
+  const NoteFormScreen({super.key, this.note, });
 
-  final NoteItem? note;
-  final ValueChanged<NoteItem> onSave;
+  final NotesModel? note;
+
 
   @override
   State<NoteFormScreen> createState() => _NoteFormScreenState();
@@ -37,17 +39,41 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
     super.dispose();
   }
 
-  void _save() {
+ Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    final note = NoteItem(
-      id: widget.note?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
-      title: _titleController.text.trim(),
-      body: _bodyController.text.trim(),
-      category: _category,
-      updatedAt: 'Just now',
-      pinned: _pinned,
-    );
-    widget.onSave(note);
+
+    try {
+      if (widget.note == null) {
+        // CREATE
+        await NotesService.createNote(
+          title: _titleController.text.trim(),
+          body: _bodyController.text.trim(),
+          category: _category,
+          pinned: _pinned,
+        );
+      } else {
+        // UPDATE
+        await NotesService.updateNote(
+          id: widget.note!.id,
+          title: _titleController.text.trim(),
+          body: _bodyController.text.trim(),
+          category: _category,
+          pinned: _pinned,
+        );
+      }
+
+      // widget.onSave();
+
+      if (!mounted) return;
+
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override

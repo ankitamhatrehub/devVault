@@ -1,8 +1,9 @@
+import 'package:dev_vault/data/models/notes_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
-import 'notes_screen.dart';
+
 
 class NoteDetailScreen extends StatelessWidget {
   const NoteDetailScreen({
@@ -12,12 +13,17 @@ class NoteDetailScreen extends StatelessWidget {
     required this.onDelete,
   });
 
-  final NoteItem note;
-  final ValueChanged<NoteItem> onEdit;
+  final NotesModel note;
+  final ValueChanged<NotesModel> onEdit;
   final ValueChanged<String> onDelete;
 
   @override
   Widget build(BuildContext context) {
+    String _formatDate(DateTime? date) {
+      if (date == null) return '-';
+
+      return "${date.day}/${date.month}/${date.year}";
+    }
     return Scaffold(
       appBar: AppBar(title: const Text('Note details')),
       body: SafeArea(
@@ -55,7 +61,7 @@ class NoteDetailScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     _InfoRow(label: 'Category', value: note.category),
-                    _InfoRow(label: 'Last update', value: note.updatedAt),
+                    _InfoRow(label: 'Last update', value: _formatDate(note.updatedAt)),
                     _InfoRow(
                       label: 'Pinned',
                       value: note.pinned ? 'Yes' : 'No',

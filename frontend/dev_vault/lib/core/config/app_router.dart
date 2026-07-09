@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/authentication/presentation/pages/login_screen.dart';
@@ -115,22 +116,21 @@ class AppRouter {
         name: 'profile',
         builder: (context, state) => const MainShell(initialIndex: 4),
       ),
-      // GoRoute(
-      //   path: Routes.editProfile,
-      //   name: 'editProfile',
-      //   builder: (context, state) {
-      //     final profile = state.extra as Map<String, dynamic>?;
-      //     return EditProfileScreen(
-      //       profile: profile != null
-      //           ? ProfileModel(
-      //               id: profile['id']?.toString() ?? '',
-      //               name: profile['name']?.toString() ?? '',
-      //               email: profile['email']?.toString() ?? '',
-      //             )
-      //           : ProfileModel(id: '', name: '', email: ''),
-      //     );
-      //   },
-      // ),
+      GoRoute(
+        path: Routes.editProfile,
+        name: 'editProfile',
+        builder: (context, state) {
+          print("edit profile screen openinhg");
+          final profile = state.extra as ProfileModel?;
+          if (profile == null) {
+            return Scaffold(
+              appBar: AppBar(title: const Text('Error')),
+              body: const Center(child: Text('Profile data not found')),
+            );
+          }
+          return EditProfileScreen();
+        },
+      ),
       GoRoute(
         path: Routes.resources,
         name: 'resources',

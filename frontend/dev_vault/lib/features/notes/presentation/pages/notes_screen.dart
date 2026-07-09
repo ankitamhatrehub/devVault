@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dev_vault/data/models/notes_model.dart';
+import 'package:dev_vault/data/services/notes_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -19,86 +21,67 @@ class _NotesScreenState extends State<NotesScreen> {
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  late List<NoteItem> _notes;
+  late List<NotesModel> notes = [];
 
   @override
   void initState() {
     super.initState();
-    _notes = [
-      const NoteItem(
-        id: 'n1',
-        title: 'Interview reflection',
-        body:
-            'Focus on communication and calm pacing. Bring a short story that proves impact.',
-        category: 'Career',
-        updatedAt: 'Updated 2h ago',
-        pinned: true,
-      ),
-      const NoteItem(
-        id: 'n2',
-        title: 'Flutter performance checklist',
-        body:
-            'Avoid unnecessary rebuilds, keep widgets focused, and split large pages into smaller units.',
-        category: 'Learning',
-        updatedAt: 'Updated yesterday',
-        pinned: false,
-      ),
-      const NoteItem(
-        id: 'n3',
-        title: 'Roadmap ideas',
-        body:
-            'Create monthly review rituals and keep them lightweight so they remain sustainable.',
-        category: 'Planning',
-        updatedAt: 'Updated 3 days ago',
-        pinned: false,
-      ),
-    ];
+
     unawaited(_loadNotes());
   }
 
   Future<void> _loadNotes() async {
-    await Future<void>.delayed(const Duration(milliseconds: 650));
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final notesData = await NotesService.getAllNotes();
+
+      if (!mounted) return;
+
+      setState(() {
+        notes = notesData;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   Future<void> _refreshNotes() async {
-    setState(() => _isLoading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 550));
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+    await _loadNotes();
   }
 
-  void _addNote(NoteItem note) {
-    setState(() {
-      _notes.insert(0, note);
-      _isLoading = false;
-    });
-  }
+  Future<void> _deleteNote(String id) async {
+    try {
+      await NotesService.deleteNote(id);
 
-  void _updateNote(NoteItem updatedNote) {
-    setState(() {
-      final index = _notes.indexWhere((item) => item.id == updatedNote.id);
-      if (index >= 0) {
-        _notes[index] = updatedNote;
-      }
-    });
-  }
+      await _loadNotes();
 
-  void _deleteNote(String id) {
-    final removed = _notes.firstWhere((item) => item.id == id);
-    setState(() => _notes.removeWhere((item) => item.id == id));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Note deleted successfully'),
-        backgroundColor: AppColors.success,
-        action: SnackBarAction(
-          label: 'Undo',
-          textColor: Colors.white,
-          onPressed: () => setState(() => _notes.insert(0, removed)),
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Note deleted successfully"),
+          backgroundColor: AppColors.success,
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
@@ -107,10 +90,17 @@ class _NotesScreenState extends State<NotesScreen> {
     super.dispose();
   }
 
+  String formatDate(DateTime? date) {
+    if (date == null) return '';
+
+    return "${date.day}/${date.month}/${date.year}";
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filteredNotes = _notes.where((note) {
+    final filteredNotes = notes.where((note) {
       final query = _searchQuery.toLowerCase();
+
       return note.title.toLowerCase().contains(query) ||
           note.body.toLowerCase().contains(query) ||
           note.category.toLowerCase().contains(query);
@@ -172,10 +162,9 @@ class _NotesScreenState extends State<NotesScreen> {
                                     title: note.title,
                                     body: note.body,
                                     category: note.category,
-                                    updatedAt: note.updatedAt,
+                                    updatedAt: formatDate(note.updatedAt),
                                     pinned: note.pinned,
-                                    onTap: () =>
-                                        _openNoteDetail(context, note),
+                                    onTap: () => _openNoteDetail(context, note),
                                   );
                                 },
                               ),
@@ -188,88 +177,47 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  Future<void> _openNoteDetail(BuildContext context, NoteItem note) async {
+  Future<void> _openNoteDetail(BuildContext context, NotesModel note) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (context) => NoteDetailScreen(
           note: note,
-          onEdit: (updatedNote) async {
-            final result = await Navigator.of(context).push<NoteItem?>(
-              MaterialPageRoute<NoteItem?>(
-                builder: (context) => NoteFormScreen(
-                  note: updatedNote,
-                  onSave: (savedNote) {
-                    _updateNote(savedNote);
-                    Navigator.of(context).pop(savedNote);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Note \'${savedNote.title}\' updated successfully!',
-                        ),
-                        backgroundColor: AppColors.success,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-            if (result != null) {
-              _updateNote(result);
-            }
+          onEdit: (note) async {
+            await _openNoteForm(context, note: note);
           },
-          onDelete: (id) {
-            _deleteNote(id);
-            Navigator.of(context).pop();
+          onDelete: (id) async {
+            await _deleteNote(id);
+
+            if (!mounted) return;
+
+            Navigator.pop(context);
           },
         ),
       ),
     );
   }
 
-  Future<void> _openNoteForm(BuildContext context, {NoteItem? note}) async {
-    await Navigator.of(context).push<NoteItem?>(
-      MaterialPageRoute<NoteItem?>(
-        builder: (context) => NoteFormScreen(
-          note: note,
-          onSave: (savedNote) {
-            final isCreate = note == null;
-            if (isCreate) {
-              _addNote(savedNote);
-            } else {
-              _updateNote(savedNote);
-            }
-            Navigator.of(context).pop(savedNote);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  isCreate
-                      ? 'Note \'${savedNote.title}\' created successfully!'
-                      : 'Note \'${savedNote.title}\' updated successfully!',
-                ),
-                backgroundColor: AppColors.success,
-              ),
-            );
-          },
-        ),
-      ),
+  Future<void> _openNoteForm(BuildContext context, {NotesModel? note}) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => NoteFormScreen(note: note)),
     );
+
+    if (result == true) {
+      await _loadNotes();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            note == null
+                ? "Note created successfully"
+                : "Note updated successfully",
+          ),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
   }
-}
-
-class NoteItem {
-  const NoteItem({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.category,
-    required this.updatedAt,
-    required this.pinned,
-  });
-
-  final String id;
-  final String title;
-  final String body;
-  final String category;
-  final String updatedAt;
-  final bool pinned;
 }

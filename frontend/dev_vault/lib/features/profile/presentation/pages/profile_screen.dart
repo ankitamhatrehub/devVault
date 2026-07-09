@@ -97,23 +97,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         IconButton(
                           onPressed: () async {
-                            if (profile == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Profile data not loaded'),
-                                  backgroundColor: Colors.orange,
-                                ),
-                              );
-                              return;
-                            }
-                            print('✏️ Opening edit profile with full data');
-                            print('   Profile ID: ${profile.id}');
-                            print('   Profile Name: ${profile.name}');
-                            print('   Profile Email: ${profile.email}');
+                            print('✏️ Opening edit profile screen');
+                            print('   Profile will be fetched from API');
 
                             final result = await context.push<bool?>(
                               Routes.editProfile,
-                              extra: profile,
                             );
                             if (result == true) {
                               print('🔄 Reloading profile after edit');

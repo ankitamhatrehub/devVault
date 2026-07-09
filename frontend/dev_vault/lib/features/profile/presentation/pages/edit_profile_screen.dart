@@ -5,43 +5,92 @@ import '../../../../data/models/profile_model.dart';
 import '../../../../data/services/profile_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key, required this.profile});
-
-  final ProfileModel profile;
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _emailController;
-  late final TextEditingController _bioController;
-  late final TextEditingController _designationController;
-  late final TextEditingController _experienceController;
-  late final TextEditingController _locationController;
-  late final TextEditingController _companyController;
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _bioController;
+  late TextEditingController _designationController;
+  late TextEditingController _experienceController;
+  late TextEditingController _locationController;
+  late TextEditingController _companyController;
 
   final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
+  bool _isLoading = true;
+  ProfileModel? _profile;
 
   @override
   void initState() {
     super.initState();
-    print('✏️ EditProfileScreen initialized with full profile data');
-    print('   ID: ${widget.profile.id}');
-    print('   Name: ${widget.profile.name}');
-    print('   Email: ${widget.profile.email}');
-    print('   Bio: ${widget.profile.bio}');
-    print('   Designation: ${widget.profile.designation}');
+    print('✏️ EditProfileScreen initialized');
+    print('📡 Fetching profile data from API...');
 
-    _nameController = TextEditingController(text: widget.profile.name);
-    _emailController = TextEditingController(text: widget.profile.email);
-    _bioController = TextEditingController(text: widget.profile.bio);
-    _designationController = TextEditingController(text: widget.profile.designation);
-    _experienceController = TextEditingController(text: widget.profile.experience);
-    _locationController = TextEditingController(text: widget.profile.location);
-    _companyController = TextEditingController(text: widget.profile.currentCompany);
+    // Initialize empty controllers
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _bioController = TextEditingController();
+    _designationController = TextEditingController();
+    _experienceController = TextEditingController();
+    _locationController = TextEditingController();
+    _companyController = TextEditingController();
+
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    try {
+      print('🔄 Loading profile from API...');
+      final profile = await ProfileService.getProfile();
+
+      if (!mounted) return;
+
+      print('✅ Profile loaded successfully');
+      print('   ID: ${profile.id}');
+      print('   Name: ${profile.name}');
+      print('   Email: ${profile.email}');
+      print('   Bio: ${profile.bio}');
+      print('   Designation: ${profile.designation}');
+
+      // Fill controllers with fetched data
+      _nameController.text = profile.name;
+      _emailController.text = profile.email;
+      _bioController.text = profile.bio;
+      _designationController.text = profile.designation;
+      _experienceController.text = profile.experience;
+      _locationController.text = profile.location;
+      _companyController.text = profile.currentCompany;
+
+      setState(() {
+        _profile = profile;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      print('❌ Error loading profile: $e');
+
+      setState(() => _isLoading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load profile: $e'),
+          backgroundColor: Colors.red.shade600,
+        ),
+      );
+
+      // Go back if profile failed to load
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      });
+    }
   }
 
   @override
@@ -114,150 +163,155 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Edit profile')),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Name Field
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      prefixIcon: Icon(Icons.person_outline_rounded),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Name is required';
-                      }
-                      if (value.trim().length < 2) {
-                        return 'Name must be at least 2 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Name Field
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Name',
+                            prefixIcon: Icon(Icons.person_outline_rounded),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Name is required';
+                            }
+                            if (value.trim().length < 2) {
+                              return 'Name must be at least 2 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
 
-                  // Email Field
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Email is required';
-                      }
-                      final emailRegex =
-                          RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
-                      if (!emailRegex.hasMatch(value)) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
+                        // Email Field
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            prefixIcon: Icon(Icons.email_outlined),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Email is required';
+                            }
+                            final emailRegex = RegExp(
+                              r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                            );
+                            if (!emailRegex.hasMatch(value)) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
 
-                  // Bio Field
-                  TextFormField(
-                    controller: _bioController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Bio',
-                      prefixIcon: Icon(Icons.description_outlined),
-                      alignLabelWithHint: true,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Bio is required';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
+                        // Bio Field
+                        TextFormField(
+                          controller: _bioController,
+                          maxLines: 3,
+                          decoration: const InputDecoration(
+                            labelText: 'Bio',
+                            prefixIcon: Icon(Icons.description_outlined),
+                            alignLabelWithHint: true,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Bio is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
 
-                  // Designation Field
-                  TextFormField(
-                    controller: _designationController,
-                    decoration: const InputDecoration(
-                      labelText: 'Designation',
-                      prefixIcon: Icon(Icons.work_outline_rounded),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Designation is required';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
+                        // Designation Field
+                        TextFormField(
+                          controller: _designationController,
+                          decoration: const InputDecoration(
+                            labelText: 'Designation',
+                            prefixIcon: Icon(Icons.work_outline_rounded),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Designation is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
 
-                  // Experience Field
-                  TextFormField(
-                    controller: _experienceController,
-                    decoration: const InputDecoration(
-                      labelText: 'Experience',
-                      prefixIcon: Icon(Icons.trending_up_rounded),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Experience is required';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
+                        // Experience Field
+                        TextFormField(
+                          controller: _experienceController,
+                          decoration: const InputDecoration(
+                            labelText: 'Experience',
+                            prefixIcon: Icon(Icons.trending_up_rounded),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Experience is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
 
-                  // Company Field
-                  TextFormField(
-                    controller: _companyController,
-                    decoration: const InputDecoration(
-                      labelText: 'Current Company',
-                      prefixIcon: Icon(Icons.business_outlined),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
+                        // Company Field
+                        TextFormField(
+                          controller: _companyController,
+                          decoration: const InputDecoration(
+                            labelText: 'Current Company',
+                            prefixIcon: Icon(Icons.business_outlined),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
 
-                  // Location Field
-                  TextFormField(
-                    controller: _locationController,
-                    decoration: const InputDecoration(
-                      labelText: 'Location',
-                      prefixIcon: Icon(Icons.location_on_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Location is required';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
+                        // Location Field
+                        TextFormField(
+                          controller: _locationController,
+                          decoration: const InputDecoration(
+                            labelText: 'Location',
+                            prefixIcon: Icon(Icons.location_on_outlined),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Location is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
 
-                  // Save Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isSaving ? null : _saveProfile,
-                      child: _isSaving
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Save Changes'),
+                        // Save Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _isSaving ? null : _saveProfile,
+                            child: _isSaving
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text('Save Changes'),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),
       ),
     );
   }
