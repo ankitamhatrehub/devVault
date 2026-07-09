@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dev_vault/data/models/tasks_model.dart';
+import 'package:dev_vault/data/services/tasks_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,105 +22,63 @@ class _TasksScreenState extends State<TasksScreen> {
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  late List<TaskItem> _tasks;
+  List<TasksModel> _tasks = [];
 
   @override
   void initState() {
     super.initState();
-    _tasks = [
-      const TaskItem(
-        id: 't1',
-        title: 'System design revision',
-        description: 'Review scalability patterns and design a notification service',
-        priority: 'High',
-        progress: 0.6,
-        dueDate: '2026-07-10',
-        status: 'In Progress',
-        category: 'Learning',
-        createdAt: 'Created 2h ago',
-      ),
-      const TaskItem(
-        id: 't2',
-        title: 'Review Flutter architecture',
-        description: 'Complete the Flutter architecture module and understand routing patterns',
-        priority: 'Medium',
-        progress: 0.82,
-        dueDate: '2026-07-08',
-        status: 'In Progress',
-        category: 'Learning',
-        createdAt: 'Created yesterday',
-      ),
-      const TaskItem(
-        id: 't3',
-        title: 'Polish DevVault onboarding',
-        description: 'Ensure the onboarding flow is smooth and visually polished',
-        priority: 'High',
-        progress: 0.45,
-        dueDate: '2026-07-18',
-        status: 'Planning',
-        category: 'Project',
-        createdAt: 'Created 3 days ago',
-      ),
-      const TaskItem(
-        id: 't4',
-        title: 'Mock interview preparation',
-        description: 'Practice system design and behavioral questions',
-        priority: 'Medium',
-        progress: 0.3,
-        dueDate: '2026-07-12',
-        status: 'Pending',
-        category: 'Interview',
-        createdAt: 'Created 1 day ago',
-      ),
-    ];
-    unawaited(_loadTasks());
+    _loadTasks();
   }
 
-  Future<void> _loadTasks() async {
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+ Future<void> _loadTasks() async {
+    try {
+      setState(() => _isLoading = true);
+
+      final tasksData = await TasksService.getAllTasks();
+
+      if (!mounted) return;
+
+      setState(() {
+        _tasks = tasksData;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() => _isLoading = false);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
-  Future<void> _refreshTasks() async {
-    setState(() => _isLoading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+Future<void> _refreshTasks() async {
+    await _loadTasks();
   }
 
-  void _addTask(TaskItem task) {
-    setState(() {
-      _tasks.insert(0, task);
-      _isLoading = false;
-    });
-  }
+Future<void> _deleteTask(String id) async {
+    try {
+      await TasksService.deleteTask(id);
 
-  void _updateTask(TaskItem updatedTask) {
-    setState(() {
-      final index = _tasks.indexWhere((item) => item.id == updatedTask.id);
-      if (index >= 0) {
-        _tasks[index] = updatedTask;
-      }
-    });
-  }
+      await _loadTasks();
 
-  void _deleteTask(String id) {
-    final removed = _tasks.firstWhere((item) => item.id == id);
-    setState(() => _tasks.removeWhere((item) => item.id == id));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Task deleted successfully'),
-        backgroundColor: AppColors.success,
-        action: SnackBarAction(
-          label: 'Undo',
-          textColor: Colors.white,
-          onPressed: () => setState(() => _tasks.insert(0, removed)),
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Task deleted successfully"),
+          backgroundColor: AppColors.success,
         ),
-      ),
-    );
-  }
+      );
+    } catch (e) {
+      if (!mounted) return;
 
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
   @override
   void dispose() {
     _searchController.dispose();
@@ -127,8 +87,9 @@ class _TasksScreenState extends State<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredTasks = _tasks.where((task) {
+  final filteredTasks = _tasks.where((task) {
       final query = _searchQuery.toLowerCase();
+
       return task.title.toLowerCase().contains(query) ||
           task.description.toLowerCase().contains(query) ||
           task.category.toLowerCase().contains(query);
@@ -211,10 +172,9 @@ class _TasksScreenState extends State<TasksScreen> {
                                     description: task.description,
                                     priority: task.priority,
                                     status: task.status,
-                                    progress: task.progress,
+                                   progress: task.progress.toDouble(),
                                     dueDate: task.dueDate,
-                                    onTap: () =>
-                                        _openTaskDetail(context, task),
+                                    onTap: () => _openTaskDetail(context, task),
                                   );
                                 },
                               ),
@@ -227,100 +187,49 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
-  Future<void> _openTaskDetail(
-    BuildContext context,
-    TaskItem task,
-  ) async {
+  Future<void> _openTaskDetail(BuildContext context, TasksModel task) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (context) => TaskDetailScreen(
           task: task,
-          onEdit: (updatedTask) async {
-            final result = await Navigator.of(context).push<TaskItem?>(
-              MaterialPageRoute<TaskItem?>(
-                builder: (context) => TaskFormScreen(
-                  task: updatedTask,
-                  onSave: (savedTask) {
-                    _updateTask(savedTask);
-                    Navigator.of(context).pop(savedTask);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Task \'${savedTask.title}\' updated successfully!',
-                        ),
-                        backgroundColor: AppColors.success,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-            if (result != null) {
-              _updateTask(result);
-            }
+         onEdit: (task) async {
+            await _openTaskForm(context, task: task);
           },
-          onDelete: (id) {
-            _deleteTask(id);
-            Navigator.of(context).pop();
+         onDelete: (id) async {
+            await _deleteTask(id);
+
+            if (!mounted) return;
+
+            Navigator.pop(context);
           },
         ),
       ),
     );
   }
 
-  Future<void> _openTaskForm(
-    BuildContext context, {
-    TaskItem? task,
-  }) async {
-    await Navigator.of(context).push<TaskItem?>(
-      MaterialPageRoute<TaskItem?>(
-        builder: (context) => TaskFormScreen(
-          task: task,
-          onSave: (savedTask) {
-            final isCreate = task == null;
-            if (isCreate) {
-              _addTask(savedTask);
-            } else {
-              _updateTask(savedTask);
-            }
-            Navigator.of(context).pop(savedTask);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  isCreate
-                      ? 'Task \'${savedTask.title}\' created successfully!'
-                      : 'Task \'${savedTask.title}\' updated successfully!',
-                ),
-                backgroundColor: AppColors.success,
-              ),
-            );
-          },
-        ),
+  Future<void> _openTaskForm(BuildContext context, {TasksModel? task}) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TaskFormScreen(task: task, onSave: () {}),
       ),
     );
+
+    if (result == true) {
+      await _loadTasks();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            task == null
+                ? "Task created successfully"
+                : "Task updated successfully",
+          ),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
   }
-}
-
-class TaskItem {
-  const TaskItem({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.priority,
-    required this.progress,
-    required this.dueDate,
-    required this.status,
-    required this.category,
-    required this.createdAt,
-  });
-
-  final String id;
-  final String title;
-  final String description;
-  final String priority;
-  final double progress;
-  final String dueDate;
-  final String status;
-  final String category;
-  final String createdAt;
 }

@@ -1,8 +1,8 @@
+import 'package:dev_vault/data/models/tasks_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
-import 'tasks_screen.dart';
 
 class TaskDetailScreen extends StatelessWidget {
   const TaskDetailScreen({
@@ -12,12 +12,18 @@ class TaskDetailScreen extends StatelessWidget {
     required this.onDelete,
   });
 
-  final TaskItem task;
-  final ValueChanged<TaskItem> onEdit;
+  final TasksModel task;
+  final ValueChanged<TasksModel> onEdit;
   final ValueChanged<String> onDelete;
 
   @override
   Widget build(BuildContext context) {
+    String formatDate(DateTime? date) {
+      if (date == null) return "-";
+
+      return "${date.day}/${date.month}/${date.year}";
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Task details')),
       body: SafeArea(
@@ -61,7 +67,7 @@ class TaskDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          task.createdAt,
+                          formatDate(task.createdAt),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -90,15 +96,14 @@ class TaskDetailScreen extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(child: Text('Completion')),
-                        Text('${(task.progress * 100).round()}%'),
+                        Text('${task.progress}%'),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                       child: LinearProgressIndicator(
-                        value: task.progress,
-                        minHeight: 8,
+                        value: task.progress / 100,
                       ),
                     ),
                   ],
@@ -189,8 +194,9 @@ class _InfoRow extends StatelessWidget {
           ),
           Text(
             value,
-            style: Theme.of(context).textTheme.bodyMedium
-                ?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),

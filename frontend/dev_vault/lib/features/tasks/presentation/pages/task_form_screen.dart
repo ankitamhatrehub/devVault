@@ -1,14 +1,15 @@
+import 'package:dev_vault/data/models/tasks_model.dart';
+import 'package:dev_vault/data/services/tasks_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
-import 'tasks_screen.dart';
 
 class TaskFormScreen extends StatefulWidget {
   const TaskFormScreen({super.key, this.task, required this.onSave});
 
-  final TaskItem? task;
-  final ValueChanged<TaskItem> onSave;
+  final TasksModel? task;
+  final VoidCallback onSave;
 
   @override
   State<TaskFormScreen> createState() => _TaskFormScreenState();
@@ -29,14 +30,16 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.task?.title ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.task?.description ?? '');
-    _dueDateController =
-        TextEditingController(text: widget.task?.dueDate ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.task?.description ?? '',
+    );
+    _dueDateController = TextEditingController(
+      text: widget.task?.dueDate ?? '',
+    );
     _priority = widget.task?.priority ?? 'Medium';
     _status = widget.task?.status ?? 'In Progress';
     _category = widget.task?.category ?? 'Learning';
-    _progress = widget.task?.progress ?? 0.5;
+    _progress = (widget.task?.progress ?? 50) / 100;
   }
 
   @override
@@ -62,21 +65,45 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     }
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    final task = TaskItem(
-      id: widget.task?.id ??
-          DateTime.now().microsecondsSinceEpoch.toString(),
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      priority: _priority,
-      progress: _progress,
-      dueDate: _dueDateController.text.trim(),
-      status: _status,
-      category: _category,
-      createdAt: widget.task?.createdAt ?? 'Just now',
-    );
-    widget.onSave(task);
+
+    try {
+      if (widget.task == null) {
+        await TasksService.createTask(
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          priority: _priority,
+          status: _status,
+          dueDate: _dueDateController.text.trim(),
+          category: _category,
+          progress: (_progress * 100).round(),
+        );
+      } else {
+        await TasksService.updateTask(
+          id: widget.task!.id,
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          priority: _priority,
+          status: _status,
+          dueDate: _dueDateController.text.trim(),
+          category: _category,
+          progress: (_progress * 100).round(),
+        );
+      }
+
+      widget.onSave();
+
+      if (!mounted) return;
+
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
@@ -89,8 +116,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Discard changes?'),
-            content:
-                const Text('Your edits will be lost if you leave this screen.'),
+            content: const Text(
+              'Your edits will be lost if you leave this screen.',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -112,9 +140,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.task == null ? 'Create task' : 'Edit task',
-          ),
+          title: Text(widget.task == null ? 'Create task' : 'Edit task'),
         ),
         body: SafeArea(
           child: Form(
@@ -133,8 +159,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                           onChanged: (_) => setState(() => _isDirty = true),
                           validator: (value) =>
                               (value == null || value.trim().isEmpty)
-                                  ? 'Task title is required.'
-                                  : null,
+                              ? 'Task title is required.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
@@ -146,17 +172,14 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                           onChanged: (_) => setState(() => _isDirty = true),
                           validator: (value) =>
                               (value == null || value.trim().isEmpty)
-                                  ? 'Add a description.'
-                                  : null,
+                              ? 'Add a description.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         DropdownButtonFormField<String>(
                           initialValue: _priority,
                           items: const [
-                            DropdownMenuItem(
-                              value: 'Low',
-                              child: Text('Low'),
-                            ),
+                            DropdownMenuItem(value: 'Low', child: Text('Low')),
                             DropdownMenuItem(
                               value: 'Medium',
                               child: Text('Medium'),
