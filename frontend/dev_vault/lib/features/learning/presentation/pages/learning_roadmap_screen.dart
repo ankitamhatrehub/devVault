@@ -1,40 +1,122 @@
+import 'package:dev_vault/core/widgets/app_text_field.dart';
+import 'package:dev_vault/data/models/learning_model.dart';
+import 'package:dev_vault/data/services/learning_service.dart';
+import 'package:dev_vault/features/learning/presentation/widgets/learning_skeleton.dart';
+import 'package:dev_vault/features/learning/presentation/widgets/learning_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import 'learning_detail_screen.dart';
+import 'learning_form_screen.dart';
+import '../widgets/empty_learning_state.dart';
+import '../widgets/empty_learning_state.dart';
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 
-class LearningRoadmapScreen extends StatelessWidget {
+class LearningRoadmapScreen extends StatefulWidget {
   const LearningRoadmapScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final categories = ['Flutter', 'System Design', 'Node.js', 'Docker'];
-    final topics = [
-      _TopicItem(
-        title: 'Flutter architecture',
-        subtitle: 'State management, routing, and clean structure',
-        progress: 0.82,
-        completed: 9,
-        total: 11,
-      ),
-      _TopicItem(
-        title: 'Node.js APIs',
-        subtitle: 'Authentication, middleware, and deployment basics',
-        progress: 0.63,
-        completed: 5,
-        total: 8,
-      ),
-      _TopicItem(
-        title: 'System design',
-        subtitle: 'Scalability patterns and trade-offs',
-        progress: 0.47,
-        completed: 4,
-        total: 9,
-      ),
-    ];
+  State<LearningRoadmapScreen> createState() => _LearningRoadmapScreenState();
+}
 
+class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
+  bool _isLoading = true;
+
+  final TextEditingController _searchController = TextEditingController();
+
+  String _searchQuery = '';
+
+  List<LearningModel> _learnings = [];
+  @override
+  void initState() {
+    super.initState();
+    _loadLearnings();
+  }
+
+  Future<void> _loadLearnings() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final data = await LearningService.getAllLearning();
+
+      if (!mounted) return;
+
+      setState(() {
+        _learnings = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _refreshLearnings() async {
+    await _loadLearnings();
+  }
+
+  Future<void> _deleteLearning(String id) async {
+    try {
+      await LearningService.deleteLearning(id);
+
+      await _loadLearnings();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Learning deleted successfully"),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  final List<String> categories = const [
+    "Flutter",
+    "Node.js",
+    "System Design",
+    "Docker",
+  ];
+  @override
+  Widget build(BuildContext context) {
+    final filteredLearnings = _learnings.where((learning) {
+      final query = _searchQuery.toLowerCase();
+
+      return learning.title.toLowerCase().contains(query) ||
+          learning.des.toLowerCase().contains(query) ||
+          learning.category.toLowerCase().contains(query) ||
+          learning.priority.toLowerCase().contains(query) ||
+          learning.status.toLowerCase().contains(query);
+    }).toList();
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
+        onPressed: () => _openLearningForm(context),
+        icon: const Icon(Icons.add),
+        label: const Text("New Roadmap"),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -52,6 +134,35 @@ class LearningRoadmapScreen extends StatelessWidget {
                   color: AppColors.textSecondary,
                 ),
               ),
+              const SizedBox(height: AppSpacing.md),
+
+              AppTextField(
+                controller: _searchController,
+                hintText: "Search roadmap",
+
+                prefixIcon: const Icon(Icons.search),
+
+                suffixIcon: _searchQuery.isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          _searchController.clear();
+
+                          setState(() {
+                            _searchQuery = '';
+                          });
+                        },
+                      ),
+
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: AppSpacing.md),
               const SizedBox(height: AppSpacing.lg),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -121,62 +232,46 @@ class LearningRoadmapScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               Expanded(
-                child: ListView.separated(
-                  itemCount: topics.length,
-                  separatorBuilder: (_, __) =>
-                      const SizedBox(height: AppSpacing.sm),
-                  itemBuilder: (context, index) {
-                    final topic = topics[index];
-                    return Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(AppRadius.medium),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  topic.title,
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
+                child: _isLoading
+                    ? const LearningSkeleton()
+                    : RefreshIndicator(
+                        onRefresh: _refreshLearnings,
+                        child: filteredLearnings.isEmpty
+                            ? const EmptyLearningState()
+                            : ListView.separated(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                itemCount: filteredLearnings.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: AppSpacing.sm),
+                                itemBuilder: (context, index) {
+                                  final learning = filteredLearnings[index];
+
+                                  final completed = learning.steps
+                                      .where((e) => e.isCompleted)
+                                      .length;
+
+                                  final total = learning.steps.length;
+
+                                  final progress = total == 0
+                                      ? 0.0
+                                      : completed / total;
+
+                                  return LearningTile(
+                                    title: learning.title,
+                                    description: learning.des,
+                                    category: learning.category,
+                                    status: learning.status,
+                                    priority: learning.priority,
+                                    progress: progress,
+                                    completedSteps: completed,
+                                    totalSteps: total,
+                                    targetDate: learning.targetDate,
+                                    onTap: () =>
+                                        _openLearningDetail(context, learning),
+                                  );
+                                },
                               ),
-                              Text(
-                                '${(topic.progress * 100).round()}%',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: AppColors.primary),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            topic.subtitle,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: AppColors.textSecondary),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(AppRadius.pill),
-                            child: LinearProgressIndicator(
-                              value: topic.progress,
-                              minHeight: 8,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            '${topic.completed}/${topic.total} completed',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: AppColors.textSecondary),
-                          ),
-                        ],
                       ),
-                    );
-                  },
-                ),
               ),
             ],
           ),
@@ -184,20 +279,57 @@ class LearningRoadmapScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-class _TopicItem {
-  const _TopicItem({
-    required this.title,
-    required this.subtitle,
-    required this.progress,
-    required this.completed,
-    required this.total,
-  });
+  Future<void> _openLearningDetail(
+    BuildContext context,
+    LearningModel learning,
+  ) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LearningDetailScreen(
+          learning: learning,
 
-  final String title;
-  final String subtitle;
-  final double progress;
-  final int completed;
-  final int total;
+          onEdit: (learning) async {
+            await _openLearningForm(context, learning: learning);
+          },
+
+          onDelete: (id) async {
+            await _deleteLearning(id);
+
+            if (!mounted) return;
+
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openLearningForm(
+    BuildContext context, {
+    LearningModel? learning,
+  }) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => LearningFormScreen(learning: learning)),
+    );
+
+    if (result == true) {
+      await _loadLearnings();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.success,
+          content: Text(
+            learning == null
+                ? "Learning roadmap created successfully"
+                : "Learning roadmap updated successfully",
+          ),
+        ),
+      );
+    }
+  }
 }
