@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const AuthSchema = new mongoose.Schema(
   {
     name: {
@@ -39,6 +40,16 @@ const AuthSchema = new mongoose.Schema(
       type: String,
       // required: true,
       trim: true,
+    },
+    profileImage: {
+      url: {
+        type: String,
+        default: "",
+      },
+      publicId: {
+        type: String,
+        default: "",
+      },
     },
   },
   {
