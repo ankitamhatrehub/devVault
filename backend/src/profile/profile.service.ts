@@ -14,6 +14,7 @@ export const updateprofileService = async (
     experience: String;
     currentCompany?: String;
     location: String;
+
   },
   // name,
   // email,

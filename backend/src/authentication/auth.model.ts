@@ -41,7 +41,7 @@ const AuthSchema = new mongoose.Schema(
       // required: true,
       trim: true,
     },
-    profileImage: {
+    avatar: {
       url: {
         type: String,
         default: "",

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import '../constant_urls.dart';
 import '../models/profile_model.dart';
 import 'local_storage_service.dart';
@@ -59,6 +60,7 @@ class AuthService {
     }
 
     try {
+      debugPrint("data");
       final response = await _dio.post(
         registerUrl,
         data: {
@@ -68,7 +70,9 @@ class AuthService {
           'confirmPassword': confirmPassword,
         },
       );
-
+      debugPrint("response 01 ${response.statusCode}");
+      debugPrint("response 02 ${response.data}");
+      debugPrint("response 03 ${response.realUri}");
       if (response.statusCode == 201 || response.statusCode == 200) {
         final data = response.data;
 
@@ -82,15 +86,19 @@ class AuthService {
           throw Exception(data['message'] ?? 'Registration failed');
         }
       } else {
-        throw Exception('Registration failed with status ${response.statusCode}');
+        throw Exception(
+          'Registration failed with status ${response.statusCode}',
+        );
       }
     } on DioException catch (e) {
       if (e.response?.data != null) {
         final errorMessage = e.response?.data['message'] ?? e.message;
+        debugPrint("response 06 ${errorMessage}");
         throw Exception(errorMessage);
       }
       throw Exception('Registration error: ${e.message}');
     } catch (e) {
+      debugPrint("response 07 $e");
       throw Exception(e.toString());
     }
   }
@@ -124,10 +132,7 @@ class AuthService {
     try {
       final response = await _dio.post(
         loginUrl,
-        data: {
-          'email': email.trim(),
-          'password': password,
-        },
+        data: {'email': email.trim(), 'password': password},
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {

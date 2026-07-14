@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/profile_model.dart';
@@ -28,18 +31,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print('📡 Loading user profile...');
       final profile = await ProfileService.getProfile();
       if (!mounted) return;
-      print('✅ Profile loaded successfully');
+      print('✅ Profile loaded successfully ');
       setState(() {
         _profile = profile;
         _isLoading = false;
       });
+      print("Avatar URL: ${_profile?.avatar}");
     } catch (e) {
       if (!mounted) return;
       print('❌ Error loading profile: $e');
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Unable to load profile: $e'),
           backgroundColor: Colors.red.shade600,
@@ -48,10 +50,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // Inside your _ProfileScreenState class
+
+  Future<void> _pickAndUploadImage() async {
+    final ImagePicker picker = ImagePicker();
+
+    // 1. Let user pick image
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) return; // User cancelled
+
+    setState(() => _isLoading = true);
+
+    try {
+      // 2. Upload using service
+      final newUrl = await ProfileService.uploadProfileImage(File(image.path));
+
+      // 3. Update UI
+      if (newUrl != null && mounted) {
+        await _loadProfile(); // Refresh the profile to get the new URL
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile picture updated!')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = _profile;
-
+    debugPrint("there i image  ${_profile?.avatar}");
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: SafeArea(
@@ -64,14 +99,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundColor: AppColors.primarySoft,
-                          child: const Icon(
-                            Icons.person_outline_rounded,
-                            color: AppColors.primary,
+                        // Inside your build method, wrap the CircleAvatar:
+                        InkWell(
+                          onTap: _pickAndUploadImage,
+                          borderRadius: BorderRadius.circular(36),
+                          child: Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 36,
+                                // If your profile model has an image URL, use it here:
+                                backgroundImage:
+                                    (_profile?.avatar.isNotEmpty == true)
+                                    ? NetworkImage(_profile!.avatar)
+                                    : null,
+                                backgroundColor: AppColors.primarySoft,
+                                child: (_profile?.avatar.isEmpty ?? true)
+                                    ? const Icon(
+                                        Icons.person_outline_rounded,
+                                        color: AppColors.primary,
+                                      )
+                                    : null,
+                              ),
+                              // Optional: Add a little camera icon overlay
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(

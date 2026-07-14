@@ -1,4 +1,4 @@
-const String baseUrl = "http://192.168.0.101:3000/api/";
+const String baseUrl = "http://192.168.0.105:3000/api/";
 
 //authentication urls
 const String registerUrl = "${baseUrl}auth/register";
@@ -8,6 +8,7 @@ const String loginUrl = "${baseUrl}auth/login";
 const String getProfileUrl = "${baseUrl}profile/getProfile";
 const String editProfileUrl = "${baseUrl}profile/editProfile";
 const String changePasswordUrl = "${baseUrl}profile/change-password";
+const String uploadProfileImageUrl = "${baseUrl}profile/upload";
 
 //projects urls
 const String createProjectUrl = "${baseUrl}projects/createProject";

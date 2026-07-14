@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import '../constant_urls.dart';
 import '../models/profile_model.dart';
 import 'local_storage_service.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileService {
   static final Dio _dio = Dio();
@@ -141,5 +143,35 @@ class ProfileService {
   /// Get stored user name
   static String? getStoredName() {
     return LocalStorageService.getUserName();
+  }
+
+  static Future<String?> uploadProfileImage(File imageFile) async {
+    try {
+      // 1. Create FormData.
+      // IMPORTANT: The key "file" MUST match your backend's upload.single("file")
+      String fileName = imageFile.path.split('/').last;
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+        ),
+      });
+
+      // 2. Send the request
+      // Make sure to add your auth headers/token here!
+      final response = await _dio.post(
+        uploadProfileImageUrl, // Your backend route
+        data: formData,
+        options: Options(headers: _getAuthHeaders()),
+      );
+      print("response data ===>  ${response.data}. ");
+
+      print("response ${response.statusCode}. ");
+      // 3. Return the new URL sent back by the backend
+      return response.data['url'];
+    } catch (e) {
+      print('❌ Error uploading image: $e');
+      throw e;
+    }
   }
 }
