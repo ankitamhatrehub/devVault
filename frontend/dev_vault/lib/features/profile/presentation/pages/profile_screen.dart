@@ -190,13 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           leading: const Icon(Icons.file_present_rounded),
                           title: const Text('CV/Resume'),
                           subtitle: const Text('Upload your CV'),
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('CV upload coming soon'),
-                              ),
-                            );
-                          },
+                          onTap: () => context.go(Routes.resume),
                         ),
                         ListTile(
                           enabled: false,

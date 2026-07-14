@@ -9,6 +9,7 @@ import '../../features/main_shell/presentation/pages/main_shell.dart';
 import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/onboarding/presentation/pages/splash_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
+import '../../features/resume/presentation/pages/resume_screen.dart';
 import '../../features/tasks/presentation/pages/tasks_screen.dart';
 
 class Routes {
@@ -30,6 +31,7 @@ class Routes {
   static const learning = '/learning';
   static const profile = '/profile';
   static const editProfile = '/edit-profile';
+  static const resume = '/resume';
   static const resources = '/resources';
   static const interviewQuestions = '/interview-questions';
   static const mainShell = '/main-shell';
@@ -145,6 +147,11 @@ class AppRouter {
         path: Routes.tasks,
         name: 'tasks',
         builder: (context, state) => const TasksScreen(),
+      ),
+      GoRoute(
+        path: Routes.resume,
+        name: 'resume',
+        builder: (context, state) => const ResumeScreen(),
       ),
     ],
   );
