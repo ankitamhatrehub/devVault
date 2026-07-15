@@ -5,6 +5,7 @@ import 'package:dev_vault/data/services/notes_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_service.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../widgets/widgets.dart';
 import 'note_detail_screen.dart';
@@ -51,9 +52,7 @@ class _NotesScreenState extends State<NotesScreen> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackBarService.showErrorFromException(context, error: e);
     }
   }
 
@@ -69,18 +68,14 @@ class _NotesScreenState extends State<NotesScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Note deleted successfully"),
-          backgroundColor: AppColors.success,
-        ),
+      SnackBarService.showSuccess(
+        context,
+        message: 'Note deleted successfully',
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackBarService.showErrorFromException(context, error: e);
     }
   }
 

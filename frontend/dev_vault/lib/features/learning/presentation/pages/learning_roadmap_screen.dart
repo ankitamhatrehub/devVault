@@ -8,9 +8,9 @@ import 'package:go_router/go_router.dart';
 import 'learning_detail_screen.dart';
 import 'learning_form_screen.dart';
 import '../widgets/empty_learning_state.dart';
-import '../widgets/empty_learning_state.dart';
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_service.dart';
 
 class LearningRoadmapScreen extends StatefulWidget {
   const LearningRoadmapScreen({super.key});
@@ -54,9 +54,7 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackBarService.showErrorFromException(context, error: e);
     }
   }
 
@@ -72,18 +70,14 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Learning deleted successfully"),
-          backgroundColor: AppColors.success,
-        ),
+      SnackBarService.showSuccess(
+        context,
+        message: 'Learning deleted successfully',
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackBarService.showErrorFromException(context, error: e);
     }
   }
 

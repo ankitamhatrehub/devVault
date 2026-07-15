@@ -4,6 +4,7 @@ import 'package:dev_vault/data/models/projects_model.dart';
 import 'package:dev_vault/data/services/projects_service.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_service.dart';
 import '../widgets/widgets.dart';
 import 'project_detail_screen.dart';
 import 'project_form_screen.dart';
@@ -44,9 +45,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
       setState(() => _isLoading = false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackBarService.showErrorFromException(context, error: e);
     }
   }
 
@@ -59,12 +58,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       _projects.insert(0, project);
       _isLoading = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${project.projectName} created successfully!'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
+    SnackBarService.showSuccess(
+      context,
+      message: '${project.projectName} created successfully!',
     );
   }
 
@@ -87,18 +83,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Project deleted successfully"),
-          backgroundColor: AppColors.success,
-        ),
+      SnackBarService.showSuccess(
+        context,
+        message: 'Project deleted successfully',
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackBarService.showErrorFromException(context, error: e);
     }
   }
 

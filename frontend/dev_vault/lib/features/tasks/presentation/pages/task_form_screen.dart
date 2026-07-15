@@ -3,6 +3,7 @@ import 'package:dev_vault/data/services/tasks_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_service.dart';
 import '../../../../core/widgets/widgets.dart';
 
 class TaskFormScreen extends StatefulWidget {
@@ -96,13 +97,17 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
       if (!mounted) return;
 
+      SnackBarService.showSuccess(
+        context,
+        message: widget.task == null
+          ? 'Task created successfully'
+          : 'Task updated successfully',
+      );
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackBarService.showErrorFromException(context, error: e);
     }
   }
 

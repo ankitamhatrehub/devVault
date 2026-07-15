@@ -132,7 +132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             Row(
                               children: [
-                                 MetricCard(
+                                MetricCard(
                                   title: 'Completed Tasks',
                                   value: '${_dashboard?.completedTasks ?? 0}',
                                   caption: 'Finished',
@@ -182,12 +182,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             icon: Icons.note_alt_outlined,
                             label: 'Write note',
                             onTap: () => _openNoteForm(context),
-                          ),
-                          QuickActionChip(
-                            icon: Icons.quiz_outlined,
-                            label: 'Practice interview',
-                            onTap: () =>
-                                context.push(Routes.interviewQuestions),
                           ),
                         ],
                       ),
