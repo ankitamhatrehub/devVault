@@ -11,7 +11,7 @@ import projects from "../src/projects/projects.routes";
 // import interview from "../src/interview/interview.routes";
 import learning from "../src/learning/learning.routes";
 import dashboard from "../src/dashboard/dashboard.route";
-
+import resume from "../src/resume/resume.routes";
 // Create a new Express router instance for handling API routes
 const router = Router();
 
@@ -23,7 +23,7 @@ router.use("/notes", notes);
 router.use("/projects", projects);
 router.use("/profile", profile);
 router.use("/dashboard", dashboard);
-
+router.use("/resume", resume);
 // ========== EXPORTS ==========
 
 // Export the router for use in app.ts

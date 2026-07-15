@@ -64,7 +64,7 @@ const LearningSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const LearningModel = mongoose.model("learning", LearningSchema);
