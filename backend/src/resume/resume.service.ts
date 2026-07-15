@@ -2,13 +2,28 @@ import ResumeSchema from "../resume/resume.model";
 import { logger } from "../config/logger";
 export const getResumeService = async (userId: string) => {
   try {
-    const user = await ResumeSchema.findById({ userId }).sort({
+    logger.info(`getResumeService: Fetching resume for user ${userId}`);
+
+    const resume = await ResumeSchema.findOne({ userId }).sort({
       createdAt: -1,
     });
-    logger.info("this is the user resume");
-    return user;
+
+    if (!resume) {
+      logger.warn(`getResumeService: No resume found for user ${userId}`);
+      throw new Error(`No resume found for user ${userId}`);
+    }
+
+    logger.info(
+      `getResumeService: Resume fetched successfully for user ${userId}`,
+    );
+    return resume;
   } catch (error) {
-    throw Error("the error from service of get resume data " + error);
+    logger.error(
+      `getResumeService: Error fetching resume for user ${userId} - ${error instanceof Error ? error.message : String(error)}`,
+    );
+    throw Error(
+      `Failed to fetch resume: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 };
 interface UpdateResumePayload {
@@ -34,7 +49,9 @@ export const updateResumeService = async (
     const existingResume = await ResumeSchema.findOne({ userId });
 
     if (!existingResume) {
-      logger.warn(`updateResumeService: No existing resume found for user ${userId}`);
+      logger.warn(
+        `updateResumeService: No existing resume found for user ${userId}`,
+      );
       return {
         success: false,
         error: "Resume not found for this user",

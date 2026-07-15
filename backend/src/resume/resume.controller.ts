@@ -10,20 +10,35 @@ import {
 //get resume controller
 export const getResumeController = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId;
-    logger.info("this is the " + userId + " who want to see his resume");
+    const userId = (req as any).user?.userId;
 
-    const service = await getResumeService(userId);
+    if (!userId) {
+      logger.warn("getResumeController: userId not found in request");
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized - User ID not found",
+        data: null,
+      });
+    }
+
+    logger.info(`getResumeController: User ${userId} requesting resume`);
+
+    const resume = await getResumeService(userId);
+
+    logger.info(`getResumeController: Resume fetched successfully for user ${userId}`);
     return res.status(200).json({
       success: true,
-      message: "Resume fetch successfully",
-      data: service,
+      message: "Resume fetched successfully",
+      data: resume,
     });
   } catch (error) {
+    logger.error(
+      `getResumeController: Exception occurred - ${error instanceof Error ? error.message : String(error)}`
+    );
     return res.status(500).json({
       success: false,
-      message: "Something wrong in Resume fetching",
-      data: error,
+      message: error instanceof Error ? error.message : "Failed to fetch resume",
+      data: null,
     });
   }
 };
