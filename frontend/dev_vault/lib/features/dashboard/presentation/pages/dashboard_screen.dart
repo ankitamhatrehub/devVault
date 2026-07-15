@@ -47,6 +47,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
     }
   }
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good morning';
+    } else if (hour < 17) {
+      return 'Good afternoon';
+    } else {
+      return 'Good evening';
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -83,12 +94,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Good evening, User',
+                                '${_getGreeting()}, Developer 👋',
                                 style: Theme.of(context).textTheme.headlineLarge,
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Text(
-                                'Your engineering roadmap is progressing steadily.',
+                                'Track your progress and build amazing things.',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: AppColors.textSecondary,
                                 ),
@@ -96,28 +107,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ],
                           ),
                           const SizedBox(height: AppSpacing.lg),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: MetricCard(
-                                  title: 'Learning Count',
-                                  value: '${_dashboard?.learningCount ?? 0}',
-                                  caption: 'Keep the momentum',
-                                  icon: Icons.local_fire_department_rounded,
-                                  color: AppColors.warning,
-                                ),
+                          SizedBox(
+                            height: 140,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  MetricCard(
+                                    title: 'Active Projects',
+                                    value: '${_dashboard?.activeProjects ?? 0}',
+                                    caption: 'In progress',
+                                    icon: Icons.folder_open_rounded,
+                                    color: AppColors.accent,
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                  MetricCard(
+                                    title: 'Learnings',
+                                    value: '${_dashboard?.learningCount ?? 0}',
+                                    caption: 'Keep learning',
+                                    icon: Icons.school_rounded,
+                                    color: AppColors.warning,
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                  MetricCard(
+                                    title: 'Completed Tasks',
+                                    value: '${_dashboard?.completedTasks ?? 0}',
+                                    caption: 'Finished',
+                                    icon: Icons.check_circle_rounded,
+                                    color: AppColors.success,
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                  MetricCard(
+                                    title: 'Pending Tasks',
+                                    value: '${_dashboard?.pendingTasks ?? 0}',
+                                    caption: 'To do',
+                                    icon: Icons.pending_actions_rounded,
+                                    color: AppColors.primary,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: AppSpacing.sm),
-                              Expanded(
-                                child: MetricCard(
-                                  title: 'Active Projects',
-                                  value: '${_dashboard?.activeProjects ?? 0}',
-                                  caption: 'In progress',
-                                  icon: Icons.folder_open_rounded,
-                                  color: AppColors.accent,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.md),
                           GlassCard(
@@ -149,9 +178,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const SectionHeader(title: 'Recent projects'),
                           const SizedBox(height: AppSpacing.sm),
                           if ((_dashboard?.recentProjects ?? []).isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                              child: Text('No recent projects'),
+                            EmptyStateSection(
+                              icon: Icons.folder_outlined,
+                              title: 'No projects yet',
+                              subtitle: 'Start building your portfolio by creating a new project',
+                              actionLabel: 'Create Project',
+                              onAction: () => context.push(Routes.projects),
                             )
                           else
                             ...(_dashboard?.recentProjects ?? []).map((project) {
@@ -182,7 +214,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ],
                           ),
                           const SizedBox(height: AppSpacing.sm),
-                          const TaskPreview(),
+                          if ((_dashboard?.recentTasks ?? []).isEmpty)
+                            TaskPreview()
+                          else ...[
+                            TaskPreview(
+                              title: _dashboard!.recentTasks[0]['title'] ?? '',
+                              description: _dashboard!.recentTasks[0]['description'],
+                              priority: _dashboard!.recentTasks[0]['priority'],
+                              status: _dashboard!.recentTasks[0]['status'],
+                              dueDate: _dashboard!.recentTasks[0]['dueDate'],
+                              progress: ((_dashboard!.recentTasks[0]['progress'] ?? 0) as num).toDouble(),
+                            ),
+                          ],
                         ],
                       ),
                     ),
