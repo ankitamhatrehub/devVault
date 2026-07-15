@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../data/services/local_storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,7 +40,12 @@ class _SplashScreenState extends State<SplashScreen>
 
     _navigationTimer = Timer(const Duration(milliseconds: 1800), () {
       if (mounted) {
-        context.go(Routes.onboarding);
+        final isLoggedIn = LocalStorageService.isLoggedIn();
+        if (isLoggedIn) {
+          context.go(Routes.dashboard);
+        } else {
+          context.go(Routes.onboarding);
+        }
       }
     });
   }
