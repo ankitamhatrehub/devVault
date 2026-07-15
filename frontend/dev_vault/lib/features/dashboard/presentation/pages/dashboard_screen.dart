@@ -4,13 +4,49 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../data/models/dashboard_model.dart';
+import '../../../../data/services/dashboard_service.dart';
 import '../../../notes/presentation/pages/note_form_screen.dart';
 import '../../../projects/presentation/widgets/project_tile.dart';
 import '../widgets/dashboard_widgets.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  DashboardModel? _dashboard;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardData();
+  }
+
+  Future<void> _loadDashboardData() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      final dashboard = await DashboardService.getDashboard();
+      setState(() {
+        _dashboard = dashboard;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('❌ Error loading dashboard: $e');
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -22,124 +58,134 @@ class DashboardScreen extends StatelessWidget {
       },
       child: Scaffold(
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Good evening, Priya',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'Your engineering roadmap is progressing steadily.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Error: $_error'),
+                          const SizedBox(height: AppSpacing.md),
+                          ElevatedButton(
+                            onPressed: _loadDashboardData,
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Good evening, User',
+                                style: Theme.of(context).textTheme.headlineLarge,
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                'Your engineering roadmap is progressing steadily.',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: MetricCard(
+                                  title: 'Learning Count',
+                                  value: '${_dashboard?.learningCount ?? 0}',
+                                  caption: 'Keep the momentum',
+                                  icon: Icons.local_fire_department_rounded,
+                                  color: AppColors.warning,
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: MetricCard(
+                                  title: 'Active Projects',
+                                  value: '${_dashboard?.activeProjects ?? 0}',
+                                  caption: 'In progress',
+                                  icon: Icons.folder_open_rounded,
+                                  color: AppColors.accent,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          GlassCard(
+                            title: 'Today\'s focus',
+                            subtitle: _dashboard?.todayFocus?.toString() ?? 'No focus set',
+                            trailing: const Text('2h 15m'),
+                            child: const LinearProgressIndicator(value: 0.6),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          const SectionHeader(title: 'Quick actions'),
+                          const SizedBox(height: AppSpacing.sm),
+                          Wrap(
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.sm,
+                            children: [
+                              QuickActionChip(
+                                icon: Icons.note_alt_outlined,
+                                label: 'Write note',
+                                onTap: () => _openNoteForm(context),
+                              ),
+                              QuickActionChip(
+                                icon: Icons.quiz_outlined,
+                                label: 'Practice interview',
+                                onTap: () => context.push(Routes.interviewQuestions),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.xl),
+                          const SectionHeader(title: 'Recent projects'),
+                          const SizedBox(height: AppSpacing.sm),
+                          if ((_dashboard?.recentProjects ?? []).isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                              child: Text('No recent projects'),
+                            )
+                          else
+                            ...(_dashboard?.recentProjects ?? []).map((project) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                                child: GestureDetector(
+                                  onTap: () => context.push(Routes.projects),
+                                  child: ProjectTile(
+                                    name: project['name'] ?? 'Untitled',
+                                    status: project['status'] ?? 'In progress',
+                                    stack: project['stack'] ?? 'Unknown',
+                                    progress: ((project['progress'] ?? 0) as num).toDouble(),
+                                    deadline: project['deadline'] ?? '2026-07-28',
+                                    onTap: () => context.push(Routes.projects),
+                                  ),
+                                ),
+                              );
+                            }),
+                          const SizedBox(height: AppSpacing.lg),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const SectionHeader(title: 'Today\'s tasks'),
+                              TextButton(
+                                onPressed: () => context.push(Routes.tasks),
+                                child: const Text('See all'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          const TaskPreview(),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Row(
-                  children: [
-                    Expanded(
-                      child: MetricCard(
-                        title: 'Learning streak',
-                        value: '12 days',
-                        caption: 'Keep the momentum',
-                        icon: Icons.local_fire_department_rounded,
-                        color: AppColors.warning,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: MetricCard(
-                        title: 'Projects',
-                        value: '5 active',
-                        caption: '3 shipping this month',
-                        icon: Icons.folder_open_rounded,
-                        color: AppColors.accent,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                GlassCard(
-                  title: 'Today\'s focus',
-                  subtitle: 'System design revision • 60% complete',
-                  trailing: const Text('2h 15m'),
-                  child: const LinearProgressIndicator(value: 0.6),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                const SectionHeader(title: 'Quick actions'),
-                const SizedBox(height: AppSpacing.sm),
-                Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
-                  children: [
-                    QuickActionChip(
-                      icon: Icons.note_alt_outlined,
-                      label: 'Write note',
-                      onTap: () => _openNoteForm(context),
-                    ),
-                    QuickActionChip(
-                      icon: Icons.quiz_outlined,
-                      label: 'Practice interview',
-                      onTap: () => context.push(Routes.interviewQuestions),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                const SectionHeader(title: 'Recent projects'),
-                const SizedBox(height: AppSpacing.sm),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: GestureDetector(
-                    onTap: () => context.push(Routes.projects),
-                    child: ProjectTile(
-                      name: 'DevVault',
-                      status: 'In review',
-                      stack: 'Flutter • GoRouter',
-                      progress: 0.82,
-                      deadline: '2026-07-18',
-                      onTap: () => context.push(Routes.projects),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: GestureDetector(
-                    onTap: () => context.push(Routes.projects),
-                    child: ProjectTile(
-                      name: 'Expense Tracker',
-                      status: 'Shipping soon',
-                      stack: 'Flutter • Firebase',
-                      progress: 0.61,
-                      deadline: '2026-07-28',
-                      onTap: () => context.push(Routes.projects),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const SectionHeader(title: 'Today\'s tasks'),
-                    TextButton(
-                      onPressed: () => context.push(Routes.tasks),
-                      child: const Text('See all'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                const TaskPreview(),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -168,9 +214,7 @@ Future<bool> _showExitDialog(BuildContext context) async {
 }
 
 void _openNoteForm(BuildContext context) {
-  Navigator.of(context).push<void>(
-    MaterialPageRoute<void>(
-      builder: (context) => NoteFormScreen(),
-    ),
-  );
+  Navigator.of(
+    context,
+  ).push<void>(MaterialPageRoute<void>(builder: (context) => NoteFormScreen()));
 }

@@ -1,55 +1,47 @@
 class DashboardModel {
   DashboardModel({
-    required this.totalTasks,
-    required this.totalNotes,
     required this.totalProjects,
-    required this.totalLearnings,
-    this.completedTasks = 0,
-    this.completedLearnings = 0,
-    this.completedProjects = 0,
-    this.pinnedNotes = 0,
-    this.highPriorityTasks = 0,
-    this.inProgressProjects = 0,
+    required this.activeProjects,
+    required this.completedTasks,
+    required this.pendingTasks,
+    required this.learningCount,
+    this.todayFocus,
+    this.recentProjects = const [],
+    this.recentTasks = const [],
   });
 
-  final int totalTasks;
-  final int totalNotes;
   final int totalProjects;
-  final int totalLearnings;
+  final int activeProjects;
   final int completedTasks;
-  final int completedLearnings;
-  final int completedProjects;
-  final int pinnedNotes;
-  final int highPriorityTasks;
-  final int inProgressProjects;
+  final int pendingTasks;
+  final int learningCount;
+  final dynamic todayFocus;
+  final List<dynamic> recentProjects;
+  final List<dynamic> recentTasks;
 
   factory DashboardModel.fromJson(Map<String, dynamic> json) {
     return DashboardModel(
-      totalTasks: json['totalTasks'] is int ? json['totalTasks'] : 0,
-      totalNotes: json['totalNotes'] is int ? json['totalNotes'] : 0,
       totalProjects: json['totalProjects'] is int ? json['totalProjects'] : 0,
-      totalLearnings: json['totalLearnings'] is int ? json['totalLearnings'] : 0,
+      activeProjects: json['activeProjects'] is int ? json['activeProjects'] : 0,
       completedTasks: json['completedTasks'] is int ? json['completedTasks'] : 0,
-      completedLearnings: json['completedLearnings'] is int ? json['completedLearnings'] : 0,
-      completedProjects: json['completedProjects'] is int ? json['completedProjects'] : 0,
-      pinnedNotes: json['pinnedNotes'] is int ? json['pinnedNotes'] : 0,
-      highPriorityTasks: json['highPriorityTasks'] is int ? json['highPriorityTasks'] : 0,
-      inProgressProjects: json['inProgressProjects'] is int ? json['inProgressProjects'] : 0,
+      pendingTasks: json['pendingTasks'] is int ? json['pendingTasks'] : 0,
+      learningCount: json['learningCount'] is int ? json['learningCount'] : 0,
+      todayFocus: json['todayFocus'],
+      recentProjects: json['recentProjects'] is List ? json['recentProjects'] : [],
+      recentTasks: json['recentTasks'] is List ? json['recentTasks'] : [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'totalTasks': totalTasks,
-      'totalNotes': totalNotes,
       'totalProjects': totalProjects,
-      'totalLearnings': totalLearnings,
+      'activeProjects': activeProjects,
       'completedTasks': completedTasks,
-      'completedLearnings': completedLearnings,
-      'completedProjects': completedProjects,
-      'pinnedNotes': pinnedNotes,
-      'highPriorityTasks': highPriorityTasks,
-      'inProgressProjects': inProgressProjects,
+      'pendingTasks': pendingTasks,
+      'learningCount': learningCount,
+      'todayFocus': todayFocus,
+      'recentProjects': recentProjects,
+      'recentTasks': recentTasks,
     };
   }
 }

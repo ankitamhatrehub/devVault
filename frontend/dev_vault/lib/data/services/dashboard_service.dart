@@ -27,10 +27,11 @@ class DashboardService {
         if (data['success'] == true && data['data'] != null) {
           final dashboard = DashboardModel.fromJson(data['data']);
           print('✅ Dashboard data fetched successfully');
-          print('   Total Tasks: ${dashboard.totalTasks}');
-          print('   Total Notes: ${dashboard.totalNotes}');
           print('   Total Projects: ${dashboard.totalProjects}');
-          print('   Total Learnings: ${dashboard.totalLearnings}');
+          print('   Active Projects: ${dashboard.activeProjects}');
+          print('   Completed Tasks: ${dashboard.completedTasks}');
+          print('   Pending Tasks: ${dashboard.pendingTasks}');
+          print('   Learning Count: ${dashboard.learningCount}');
           return dashboard;
         } else {
           throw Exception(data['message'] ?? 'Failed to fetch dashboard');
