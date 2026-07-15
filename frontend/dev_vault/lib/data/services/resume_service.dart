@@ -1,52 +1,145 @@
-import 'dart:io';
+import 'package:dio/dio.dart';
+import '../constant_urls.dart';
 import '../models/resume_model.dart';
+import 'local_storage_service.dart';
 
 class ResumeService {
-  // TODO: Integrate with backend API
-  // This service will handle:
-  // - Fetching resume data
-  // - Uploading resume to Cloudinary
-  // - Deleting resume
-  // - Downloading resume
+  static final Dio _dio = Dio();
 
-  static Future<ResumeModel?> getResume() async {
+  static Map<String, dynamic> _getAuthHeaders() {
+    final token = LocalStorageService.getToken();
+    return {'Authorization': token != null ? 'Bearer $token' : ''};
+  }
+
+  /// Get Resume
+  static Future<ResumeModel> getResume() async {
     try {
-      // TODO: Implement API call to fetch resume
-      // final response = await http.get(Uri.parse('$baseUrl/resume'));
-      // return ResumeModel.fromJson(jsonDecode(response.body));
-      return null;
+      print('📡 Fetching Resume');
+
+      final response = await _dio.get(
+        getResumeUrl,
+        options: Options(headers: _getAuthHeaders()),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+
+        if (data['success'] == true && data['data'] != null) {
+          final resume = ResumeModel.fromJson(data['data']);
+          print('✅ Resume fetched: ${resume.fileName}');
+          return resume;
+        } else {
+          throw Exception(data['message'] ?? 'Failed to fetch resume');
+        }
+      } else {
+        throw Exception('Failed with status ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      print('❌ Error: ${e.message}');
+      throw Exception(e.response?.data['message'] ?? e.message);
     } catch (e) {
-      rethrow;
+      throw Exception(e.toString());
     }
   }
 
-  static Future<String?> uploadResume(File file) async {
+  /// Update Resume
+  static Future<ResumeModel> updateResume({
+    required String fileName,
+    required String fileUrl,
+    required String fileSize,
+    required String publicId,
+  }) async {
     try {
-      // TODO: Implement upload to Cloudinary
-      // 1. Get Cloudinary credentials from backend
-      // 2. Upload file to Cloudinary
-      // 3. Save resume data to backend API
-      // 4. Return URL
-      return null;
+      print('✏️ Updating Resume: $fileName');
+
+      final response = await _dio.put(
+        updateResumeUrl,
+        data: {
+          'fileName': fileName,
+          'fileUrl': fileUrl,
+          'fileSize': fileSize,
+          'publicId': publicId,
+        },
+        options: Options(headers: _getAuthHeaders()),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+
+        if (data['success'] == true && data['data'] != null) {
+          final resume = ResumeModel.fromJson(data['data']);
+          print('✅ Resume updated successfully');
+          return resume;
+        }
+
+        throw Exception(data['message'] ?? 'Failed to update resume');
+      }
+
+      throw Exception('Failed with status ${response.statusCode}');
+    } on DioException catch (e) {
+      print('❌ Error: ${e.message}');
+      throw Exception(e.response?.data['message'] ?? e.message);
     } catch (e) {
-      rethrow;
+      throw Exception(e.toString());
     }
   }
 
-  static Future<void> deleteResume(String resumeId) async {
+  /// Delete Resume
+  static Future<void> deleteResume() async {
     try {
-      // TODO: Implement API call to delete resume
-      // final response = await http.delete(Uri.parse('$baseUrl/resume/$resumeId'));
+      print('🗑️ Deleting Resume');
+
+      final response = await _dio.delete(
+        deleteResumeUrl,
+        options: Options(headers: _getAuthHeaders()),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+        if (data['success'] == true) {
+          print('✅ Resume deleted successfully');
+        } else {
+          throw Exception(data['message'] ?? 'Failed to delete resume');
+        }
+      } else {
+        throw Exception('Failed with status ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      print('❌ Error: ${e.message}');
+      throw Exception(e.response?.data['message'] ?? e.message);
     } catch (e) {
-      rethrow;
+      throw Exception(e.toString());
     }
   }
 
-  static Future<void> downloadResume(String fileUrl) async {
+  /// Download/Get Resume for download
+  static Future<ResumeModel> downloadResume() async {
     try {
-      // TODO: Implement download functionality
+      print('📥 Downloading Resume');
+
+      final response = await _dio.get(
+        downloadResumeUrl,
+        options: Options(headers: _getAuthHeaders()),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+
+        if (data['success'] == true && data['data'] != null) {
+          final resume = ResumeModel.fromJson(data['data']);
+          print('✅ Resume downloaded: ${resume.fileName}');
+          return resume;
+        } else {
+          throw Exception(data['message'] ?? 'Failed to download resume');
+        }
+      } else {
+        throw Exception('Failed with status ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      print('❌ Error: ${e.message}');
+      throw Exception(e.response?.data['message'] ?? e.message);
     } catch (e) {
-      rethrow;
+      throw Exception(e.toString());
     }
   }
 }

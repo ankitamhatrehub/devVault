@@ -1,3 +1,4 @@
+import 'package:dev_vault/data/services/resume_service.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../widgets/resume_empty_state.dart';
@@ -14,9 +15,10 @@ class ResumeScreen extends StatefulWidget {
 }
 
 class _ResumeScreenState extends State<ResumeScreen> {
-  late ResumeState _state = ResumeState.empty; // Change to 'loading' to test loading state
+  late ResumeState _state =
+      ResumeState.empty; // Change to 'loading' to test loading state
   double _uploadProgress = 0.0;
-
+  final ResumeService _resumeService = ResumeService();
   // Dummy data for testing
   String? _resumeFileName;
   String? _resumeFileSize;
@@ -30,14 +32,15 @@ class _ResumeScreenState extends State<ResumeScreen> {
 
   Future<void> _loadResume() async {
     setState(() => _state = ResumeState.loading);
+    final result = await ResumeService.getResume();
 
     // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    // await Future.delayed(const Duration(seconds: 2));
 
     // Uncomment to test different states
     setState(() {
       _state = ResumeState.empty; // Change to uploaded to test uploaded state
-      // _state = ResumeState.uploaded;
+      _state = ResumeState.uploaded;
       // _resumeFileName = 'Ankita_Shelke_Resume.pdf';
       // _resumeFileSize = '1.8 MB';
       // _resumeUploadDate = '12 July 2026';
@@ -64,15 +67,15 @@ class _ResumeScreenState extends State<ResumeScreen> {
   }
 
   void _previewResume() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Opening PDF preview...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Opening PDF preview...')));
   }
 
   void _downloadResume() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Downloading resume...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Downloading resume...')));
   }
 
   void _replaceResume() {
@@ -119,9 +122,7 @@ class _ResumeScreenState extends State<ResumeScreen> {
                 _resumeUploadDate = null;
               });
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.danger,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
             child: const Text('Delete'),
           ),
         ],
@@ -132,10 +133,7 @@ class _ResumeScreenState extends State<ResumeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Resume'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Resume'), elevation: 0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),

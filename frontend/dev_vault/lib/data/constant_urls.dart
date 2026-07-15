@@ -40,3 +40,9 @@ const String getAllLearningsUrl = "${baseUrl}learning/getAllLearnings";
 const String getLearningByIdUrl = "${baseUrl}learning/"; // Append learning ID
 const String updateLearningUrl = "${baseUrl}learning/"; // Append learning ID
 const String deleteLearningUrl = "${baseUrl}learning/"; // Append learning ID
+
+//resume urls
+const String getResumeUrl = "${baseUrl}resume/getResume";
+const String updateResumeUrl = "${baseUrl}resume/updateResume";
+const String deleteResumeUrl = "${baseUrl}resume/deleteResume";
+const String downloadResumeUrl = "${baseUrl}resume/downloadResume";
