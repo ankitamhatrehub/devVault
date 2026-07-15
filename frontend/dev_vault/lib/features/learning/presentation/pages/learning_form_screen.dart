@@ -166,7 +166,7 @@ Future<void> _save() async {
                           },
                         ),
                         const SizedBox(height: AppSpacing.md),
-                      DropdownButtonFormField<String>(
+                        DropdownButtonFormField<String>(
                           initialValue: _category,
                           decoration: const InputDecoration(
                             labelText: 'Category',
@@ -196,8 +196,6 @@ Future<void> _save() async {
                           },
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        const SizedBox(height: AppSpacing.md),
-
                         DropdownButtonFormField<String>(
                           initialValue: _status,
                           decoration: const InputDecoration(
@@ -223,8 +221,7 @@ Future<void> _save() async {
                             }
                           },
                         ),
-                     const SizedBox(height: AppSpacing.md),
-
+                        const SizedBox(height: AppSpacing.md),
                         DropdownButtonFormField<String>(
                           initialValue: _priority,
                           decoration: const InputDecoration(
@@ -246,7 +243,89 @@ Future<void> _save() async {
                               setState(() => _priority = value);
                             }
                           },
-                        ), ],
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        AppTextField(
+                          controller: _startDateController,
+                          labelText: 'Start Date',
+                          readOnly: true,
+                          onTap: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              firstDate: DateTime(2024),
+                              lastDate: DateTime(2035),
+                              initialDate: DateTime.now(),
+                            );
+
+                            if (date != null) {
+                              _startDateController.text = date
+                                  .toIso8601String()
+                                  .split('T')
+                                  .first;
+                            }
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          controller: _targetDateController,
+                          labelText: 'Target Date',
+                          readOnly: true,
+                          onTap: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              firstDate: DateTime(2024),
+                              lastDate: DateTime(2035),
+                              initialDate: DateTime.now(),
+                            );
+
+                            if (date != null) {
+                              _targetDateController.text = date
+                                  .toIso8601String()
+                                  .split('T')
+                                  .first;
+                            }
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        Text(
+                          'Learning Steps',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        ...List.generate(
+                          _stepControllers.length,
+                          (index) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: AppTextField(
+                                    controller: _stepControllers[index],
+                                    hintText: 'Step ${index + 1}',
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _stepControllers.removeAt(index);
+                                    });
+                                  },
+                                  icon: const Icon(Icons.delete),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        AppButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              _stepControllers.add(TextEditingController());
+                            });
+                          },
+                          icon: const Icon(Icons.add),
+                          label: const Text("Add Step"),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -271,93 +350,6 @@ Future<void> _save() async {
                       label: const Text('Save Learning'),
                     ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                AppTextField(
-                  controller: _startDateController,
-                  labelText: 'Start Date',
-                  readOnly: true,
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      firstDate: DateTime(2024),
-                      lastDate: DateTime(2035),
-                      initialDate: DateTime.now(),
-                    );
-
-                    if (date != null) {
-                      _startDateController.text = date
-                          .toIso8601String()
-                          .split('T')
-                          .first;
-                    }
-                  },
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                AppTextField(
-                  controller: _targetDateController,
-                  labelText: 'Target Date',
-                  readOnly: true,
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      firstDate: DateTime(2024),
-                      lastDate: DateTime(2035),
-                      initialDate: DateTime.now(),
-                    );
-
-                    if (date != null) {
-                      _targetDateController.text = date
-                          .toIso8601String()
-                          .split('T')
-                          .first;
-                    }
-                  },
-                ),
-                const SizedBox(height: AppSpacing.lg),
-
-                Text(
-                  'Learning Steps',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-
-                const SizedBox(height: AppSpacing.sm),
-
-                ...List.generate(
-                  _stepControllers.length,
-                  (index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: AppTextField(
-                            controller: _stepControllers[index],
-                            hintText: 'Step ${index + 1}',
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _stepControllers.removeAt(index);
-                            });
-                          },
-                          icon: const Icon(Icons.delete),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                AppButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _stepControllers.add(TextEditingController());
-                    });
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text("Add Step"),
                 ),
               ],
             ),

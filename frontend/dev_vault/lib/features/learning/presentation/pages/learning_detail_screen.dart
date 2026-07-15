@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
 
-class LearningDetailScreen extends StatelessWidget {
+class LearningDetailScreen extends StatefulWidget {
   const LearningDetailScreen({
     super.key,
     required this.learning,
@@ -16,17 +16,38 @@ class LearningDetailScreen extends StatelessWidget {
   final ValueChanged<String> onDelete;
 
   @override
+  State<LearningDetailScreen> createState() => _LearningDetailScreenState();
+}
+
+class _LearningDetailScreenState extends State<LearningDetailScreen> {
+  late List<LearningStepModel> steps;
+
+  @override
+  void initState() {
+    super.initState();
+    // Create a mutable copy of steps
+    steps = List<LearningStepModel>.from(widget.learning.steps);
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return '-';
+    return "${date.day}/${date.month}/${date.year}";
+  }
+
+  void _toggleStepCompletion(int index) {
+    setState(() {
+      steps[index] = LearningStepModel(
+        title: steps[index].title,
+        isCompleted: !steps[index].isCompleted,
+      );
+    });
+    print('✅ Step ${index + 1} marked as ${steps[index].isCompleted ? 'complete' : 'incomplete'}');
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String _formatDate(DateTime? date) {
-      if (date == null) return '-';
-
-      return "${date.day}/${date.month}/${date.year}";
-    }
-
-    final completedSteps = learning.steps.where((e) => e.isCompleted).length;
-
-    final totalSteps = learning.steps.length;
-
+    final completedSteps = steps.where((e) => e.isCompleted).length;
+    final totalSteps = steps.length;
     final progress = totalSteps == 0 ? 0.0 : completedSteps / totalSteps;
     return Scaffold(
       appBar: AppBar(title: const Text("Learning Roadmap")),
@@ -47,12 +68,12 @@ class LearningDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      learning.title,
+                      widget.learning.title,
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      learning.des,
+                      widget.learning.des,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
@@ -64,24 +85,24 @@ class LearningDetailScreen extends StatelessWidget {
               _DetailCard(
                 child: Column(
                   children: [
-                    _InfoRow(label: "Category", value: learning.category),
+                    _InfoRow(label: "Category", value: widget.learning.category),
 
-                    _InfoRow(label: "Status", value: learning.status),
+                    _InfoRow(label: "Status", value: widget.learning.status),
 
-                    _InfoRow(label: "Priority", value: learning.priority),
+                    _InfoRow(label: "Priority", value: widget.learning.priority),
 
-                    _InfoRow(label: "Start Date", value: learning.startDate),
+                    _InfoRow(label: "Start Date", value: widget.learning.startDate),
 
-                    _InfoRow(label: "Target Date", value: learning.targetDate),
+                    _InfoRow(label: "Target Date", value: widget.learning.targetDate),
 
                     _InfoRow(
                       label: "Created",
-                      value: _formatDate(learning.createdAt),
+                      value: _formatDate(widget.learning.createdAt),
                     ),
 
                     _InfoRow(
                       label: "Updated",
-                      value: _formatDate(learning.updatedAt),
+                      value: _formatDate(widget.learning.updatedAt),
                     ),
                   ],
                 ),
@@ -122,9 +143,8 @@ class LearningDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text('Decisions', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: AppSpacing.sm),
-              const SizedBox(height: AppSpacing.lg),
+             
+             
 
               Text(
                 "Learning Steps",
@@ -134,15 +154,27 @@ class LearningDetailScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
 
               _DetailCard(
-                child: learning.steps.isEmpty
+                child: steps.isEmpty
                     ? const Text("No steps added")
                     : Column(
-                        children: learning.steps.map((step) {
+                        children: steps.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final step = entry.value;
                           return CheckboxListTile(
                             value: step.isCompleted,
-                            onChanged: null,
+                            onChanged: (_) => _toggleStepCompletion(index),
                             controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(step.title),
+                            title: Text(
+                              step.title,
+                              style: TextStyle(
+                                decoration: step.isCompleted
+                                    ? TextDecoration.lineThrough
+                                    : TextDecoration.none,
+                                color: step.isCompleted
+                                    ? AppColors.textSecondary
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
                             dense: true,
                             contentPadding: EdgeInsets.zero,
                           );
@@ -158,9 +190,9 @@ class LearningDetailScreen extends StatelessWidget {
               _DetailCard(
                 child: Column(
                   children: [
-                    _InfoRow(label: "Start", value: learning.startDate),
+                    _InfoRow(label: "Start", value: widget.learning.startDate),
 
-                    _InfoRow(label: "Target", value: learning.targetDate),
+                    _InfoRow(label: "Target", value: widget.learning.targetDate),
                   ],
                 ),
               ),
@@ -169,7 +201,7 @@ class LearningDetailScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => onEdit(learning),
+                      onPressed: () => widget.onEdit(widget.learning),
                       icon: const Icon(Icons.edit_rounded),
                       label: const Text('Edit'),
                     ),
@@ -197,7 +229,7 @@ class LearningDetailScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete learning?'),
-        content: Text("Delete '${learning.title}' permanently?"),
+        content: Text("Delete '${widget.learning.title}' permanently?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -206,7 +238,7 @@ class LearningDetailScreen extends StatelessWidget {
           AppButton(
             variant: AppButtonVariant.tonal,
             onPressed: () {
-              onDelete(learning.id);
+              widget.onDelete(widget.learning.id);
               Navigator.pop(context);
             },
             child: const Text('Delete'),

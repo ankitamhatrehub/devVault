@@ -178,26 +178,6 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
                     .toList(),
               ),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => context.push(Routes.resources),
-                      icon: const Icon(Icons.library_books_rounded),
-                      label: const Text('View resources'),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => context.push(Routes.interviewQuestions),
-                      icon: const Icon(Icons.quiz_outlined),
-                      label: const Text('Interview prep'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
               Expanded(
                 child: _isLoading
                     ? const LearningSkeleton()
