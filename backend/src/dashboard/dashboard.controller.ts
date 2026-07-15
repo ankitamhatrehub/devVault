@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { logger } from "../config/logger";
-import { getDashboardService } from "./dashboard.service";
+import { logger } from "../config/logger.js";
+import { getDashboardService } from "./dashboard.service.js";
 
 export const getDashboardController = async (req: Request, res: Response) => {
   try {

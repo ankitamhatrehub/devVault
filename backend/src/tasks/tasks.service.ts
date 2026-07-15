@@ -1,5 +1,5 @@
-import TasksModel from "./tasks.model";
-import { logger } from "../config/logger";
+import TasksModel from "./tasks.model.js";
+import { logger } from "../config/logger.js";
 
 export const createTaskService = async (
   userId: string,

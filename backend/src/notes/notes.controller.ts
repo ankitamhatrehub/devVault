@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { logger } from "../config/logger";
+import { logger } from "../config/logger.js";
 import {
   createNoteService,
   getAllNotesService,
   getNoteByIdService,
   updateNoteService,
   deleteNoteService,
-} from "./notes.service";
+} from "./notes.service.js";
 
 export const createNoteController = async (req: Request, res: Response) => {
   try {

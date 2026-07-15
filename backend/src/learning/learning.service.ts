@@ -1,5 +1,5 @@
-import LearningModel from "./learning.model";
-import { logger } from "../config/logger";
+import LearningModel from "./learning.model.js";
+import { logger } from "../config/logger.js";
 
 export const createLearningService = async (
   userId: string,

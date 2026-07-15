@@ -5,8 +5,8 @@ import {
   getLearningByIdController,
   updateLearningController,
   deleteLearningController,
-} from "./learning.controller";
-import { authMiddleware } from "../middleware/auth.middleware";
+} from "./learning.controller.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = Router();
 

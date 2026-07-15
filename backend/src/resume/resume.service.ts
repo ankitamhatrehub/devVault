@@ -1,5 +1,5 @@
-import ResumeSchema from "../resume/resume.model";
-import { logger } from "../config/logger";
+import ResumeSchema from "../resume/resume.model.js";
+import { logger } from "../config/logger.js";
 export const getResumeService = async (userId: string) => {
   try {
     logger.info(`getResumeService: Fetching resume for user ${userId}`);

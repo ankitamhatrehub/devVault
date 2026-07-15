@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { logger } from "../config/logger";
+import { logger } from "../config/logger.js";
 import {
   getResumeService,
   updateResumeService,
   deleteResumeService,
   downloadResumeService,
-} from "./resume.service";
+} from "./resume.service.js";
 
 //get resume controller
 export const getResumeController = async (req: Request, res: Response) => {

@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { authMiddleware } from "../middleware/auth.middleware";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 import {
   getResumeController,
   updateResumeController,
   downloadResumeController,
   deleteResumeController,
-} from "../resume/resume.controller";
-import { uploadResumeController, upload } from "../resume/resume.upload.controller";
+} from "../resume/resume.controller.js";
+import { uploadResumeController, upload } from "../resume/resume.upload.controller.js";
 
 const router = Router();
 

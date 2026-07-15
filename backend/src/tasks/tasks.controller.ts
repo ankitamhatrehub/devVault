@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { logger } from "../config/logger";
+import { logger } from "../config/logger.js";
 import {
   createTaskService,
   getAllTasksService,
   getTaskByIdService,
   updateTaskService,
   deleteTaskService,
-} from "./tasks.service";
+} from "./tasks.service.js";
 
 export const createTaskController = async (req: Request, res: Response) => {
   try {

@@ -3,7 +3,7 @@ import { Request } from "express";
 // Import multer for file handling and FileFilterCallback for type safety
 import multer, { FileFilterCallback } from "multer";
 // Import our pre-configured Cloudinary connection from the config folder
-import cloudinary from "../config/cloudinary";
+import cloudinary from "../config/cloudinary.js";
 
 
 // Tell Multer to store files in RAM temporary memory, not on the hard drive

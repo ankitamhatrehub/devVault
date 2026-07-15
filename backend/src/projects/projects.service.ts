@@ -1,5 +1,5 @@
-import ProjectsModel from "./projects.model";
-import { logger } from "../config/logger";
+import ProjectsModel from "./projects.model.js";
+import { logger } from "../config/logger.js";
 
 export const createProjectService = async (
   userId: string,

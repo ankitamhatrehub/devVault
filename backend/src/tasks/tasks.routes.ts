@@ -5,8 +5,8 @@ import {
   getTaskByIdController,
   updateTaskController,
   deleteTaskController,
-} from "./tasks.controller";
-import { authMiddleware } from "../middleware/auth.middleware";
+} from "./tasks.controller.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = Router();
 

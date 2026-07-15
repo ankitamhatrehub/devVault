@@ -1,7 +1,7 @@
-import AuthSchema from "./auth.model";
+import AuthSchema from "./auth.model.js";
 import bcrypt from "bcryptjs";
 import jsonWebToken from "jsonwebtoken";
-import { logger } from "../config/logger";
+import { logger } from "../config/logger.js";
 export const registerService = async (
   name: string,
   email: string,

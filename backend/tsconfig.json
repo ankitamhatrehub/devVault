@@ -4,16 +4,18 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
-    // Environment Settings for Node.js
-    "module": "ES2020",
-    "target": "ES2020",
-    "lib": ["ES2020"],
+    // Environment Settings for Node.js ESM
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "target": "ES2022",
+    "lib": ["ES2022"],
     "types": ["node"],
 
-    // Module Resolution - using 'bundler' to avoid requiring .js extensions
-    "moduleResolution": "bundler",
+    // ESM Import Resolution and Interop
     "resolveJsonModule": true,
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
 
     // Output Options
     "sourceMap": true,
@@ -23,14 +25,15 @@
 
     // TypeScript Strictness
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "esModuleInterop": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
 
     // Module Syntax
-    "isolatedModules": true
+    "isolatedModules": true,
+    "allowImportingTsExtensions": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],

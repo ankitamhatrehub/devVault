@@ -1,16 +1,16 @@
 // Import Express framework for creating web server
 import express from "express";
-import dotenv from "dotenv";
+import { config as loadEnv } from "dotenv";
 import path from "path";
 
 // Load environment variables from .env (from project root)
-dotenv.config({ path: path.resolve(".env") });
+loadEnv({ path: path.resolve(".env") });
 
 // Import database connection
-import { connectDB } from "./config/db";
+import { connectDB } from "./config/db.js";
 
 // Import API routes - centralized routing configuration
-import router from "./routes";
+import router from "./routes.js";
 
 // Create Express application instance
 const app = express();

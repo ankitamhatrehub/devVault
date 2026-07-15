@@ -1,5 +1,5 @@
-import NotesModel from "./notes.model";
-import { logger } from "../config/logger";
+import NotesModel from "./notes.model.js";
+import { logger } from "../config/logger.js";
 
 export const createNoteService = async (
   userId: string,

@@ -1,9 +1,9 @@
 // Import Express framework and the specific types for HTTP Requests and Responses
 import express, { Request, Response } from "express";
 // Import our upload configurations and the Cloudinary helper from our middleware file
-import { upload, uploadToCloudinary } from "../middleware/upload.middleware";
-import AuthSchema from "../authentication/auth.model";
-import { logger } from "../config/logger";
+import { upload, uploadToCloudinary } from "../middleware/upload.middleware.js";
+import AuthSchema from "../authentication/auth.model.js";
+import { logger } from "../config/logger.js";
 // Create a new Express Router instance to handle our API endpoints
 const router = express.Router();
 

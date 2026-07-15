@@ -1,10 +1,10 @@
 // MongoDB connection configuration
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import { config as loadEnv } from "dotenv";
 import path from "path";
-import { logger } from "../config/logger";
+import { logger } from "../config/logger.js";
 // Load environment variables from .env file (from project root)
-dotenv.config({ path: path.resolve(".env") });
+loadEnv({ path: path.resolve(".env") });
 
 // Connect to MongoDB
 export const connectDB = async () => {

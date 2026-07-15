@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { upload } from "../middleware/upload.middleware";
+import { upload } from "../middleware/upload.middleware.js";
 import {
   getProfileController,
   updateProfileController,
   changePasword,
-} from "./profile.controller";
-import { uploadProfileImageController } from "../imageUpload/image.upload.controller";
-import { authMiddleware } from "../middleware/auth.middleware";
+} from "./profile.controller.js";
+import { uploadProfileImageController } from "../imageUpload/image.upload.controller.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 const router = Router();
 
 router.get("/getProfile", authMiddleware, getProfileController);

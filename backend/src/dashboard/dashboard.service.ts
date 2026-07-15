@@ -1,7 +1,7 @@
-import ProjectsModel from "../projects/projects.model";
-import TasksModel from "../tasks/tasks.model";
-import LearningModel from "../learning/learning.model";
-import { logger } from "../config/logger";
+import ProjectsModel from "../projects/projects.model.js";
+import TasksModel from "../tasks/tasks.model.js";
+import LearningModel from "../learning/learning.model.js";
+import { logger } from "../config/logger.js";
 
 interface DashboardResponse {
   totalProjects: number;

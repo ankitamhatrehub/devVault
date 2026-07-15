@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { logger } from "../config/logger";
+import { logger } from "../config/logger.js";
 import {
   createProjectService,
   getAllProjectsService,
   getProjectByIdService,
   updateProjectService,
   deleteProjectService,
-} from "./projects.service";
+} from "./projects.service.js";
 
 export const createProjectController = async (req: Request, res: Response) => {
   try {

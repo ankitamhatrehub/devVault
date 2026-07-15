@@ -1,5 +1,5 @@
-import AuthSchema from "../authentication/auth.model";
-import { logger } from "../config/logger";
+import AuthSchema from "../authentication/auth.model.js";
+import { logger } from "../config/logger.js";
 export const getprofileService = async (userId: string) => {
   const user = await AuthSchema.findById(userId).select("-password");
   return user;

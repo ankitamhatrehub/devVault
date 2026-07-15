@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { logger } from "../config/logger";
+import { logger } from "../config/logger.js";
 import {
   createLearningService,
   getAllLearningsService,
   getLearningByIdService,
   updateLearningService,
   deleteLearningService,
-} from "./learning.service";
+} from "./learning.service.js";
 
 export const createLearningController = async (req: Request, res: Response) => {
   try {

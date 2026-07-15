@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { logger } from "../config/logger";
+import { logger } from "../config/logger.js";
 import {
   getprofileService,
   updateprofileService,
   changePasswordProfile,
-} from "./profile.service";
+} from "./profile.service.js";
 
 export const getProfileController = async (req: Request, res: Response) => {
   try {
