@@ -90,6 +90,15 @@ Future<void> _save() async {
           )
           .toList();
 
+      if (steps.isEmpty) {
+        if (!mounted) return;
+        SnackBarService.showWarning(
+          context,
+          message: 'Please add at least one learning step',
+        );
+        return;
+      }
+
       if (widget.learning == null) {
         await LearningService.createLearning(
           title: _titleController.text.trim(),
@@ -153,10 +162,18 @@ Future<void> _save() async {
                         AppTextField(
                           controller: _titleController,
                           labelText: 'Title',
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                              ? 'Title is required.'
-                              : null,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Title is required.';
+                            }
+                            if (value.trim().length < 3) {
+                              return 'Title must be at least 3 characters.';
+                            }
+                            if (value.trim().length > 100) {
+                              return 'Title must be less than 100 characters.';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
@@ -165,7 +182,10 @@ Future<void> _save() async {
                           maxLines: 4,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'Description is required';
+                              return 'Description is required.';
+                            }
+                            if (value.trim().length < 10) {
+                              return 'Description must be at least 10 characters.';
                             }
                             return null;
                           },

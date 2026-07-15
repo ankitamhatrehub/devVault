@@ -162,10 +162,18 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                           controller: _titleController,
                           labelText: 'Task title',
                           onChanged: (_) => setState(() => _isDirty = true),
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                              ? 'Task title is required.'
-                              : null,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Task title is required.';
+                            }
+                            if (value.trim().length < 3) {
+                              return 'Title must be at least 3 characters.';
+                            }
+                            if (value.trim().length > 100) {
+                              return 'Title must be less than 100 characters.';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
@@ -175,10 +183,15 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                           maxLines: 3,
                           keyboardType: TextInputType.text,
                           onChanged: (_) => setState(() => _isDirty = true),
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                              ? 'Add a description.'
-                              : null,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Add a description.';
+                            }
+                            if (value.trim().length < 10) {
+                              return 'Description must be at least 10 characters.';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         DropdownButtonFormField<String>(
