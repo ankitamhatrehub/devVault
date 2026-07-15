@@ -163,43 +163,10 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
               ),
 
               const SizedBox(height: AppSpacing.md),
-              const SizedBox(height: AppSpacing.lg),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
-                  borderRadius: BorderRadius.circular(AppRadius.medium),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Weekly focus',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            'Finish the Flutter architecture module and schedule a mock interview.',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: AppColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.auto_awesome_rounded,
-                      color: AppColors.primary,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
+
               Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
+                spacing: 0,
+                runSpacing: 0,
                 children: categories
                     .map(
                       (category) => Chip(
@@ -210,7 +177,7 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
                     )
                     .toList(),
               ),
-              const SizedBox(height: AppSpacing.md),
+
               Row(
                 children: [
                   Expanded(
