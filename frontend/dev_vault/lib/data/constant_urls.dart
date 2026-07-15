@@ -46,3 +46,4 @@ const String getResumeUrl = "${baseUrl}resume/getResume";
 const String updateResumeUrl = "${baseUrl}resume/updateResume";
 const String deleteResumeUrl = "${baseUrl}resume/deleteResume";
 const String downloadResumeUrl = "${baseUrl}resume/downloadResume";
+const String uploadResumeUrl = "${baseUrl}resume/uploadResume";

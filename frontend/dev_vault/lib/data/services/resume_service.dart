@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import '../constant_urls.dart';
 import '../models/resume_model.dart';
@@ -135,6 +136,47 @@ class ResumeService {
       } else {
         throw Exception('Failed with status ${response.statusCode}');
       }
+    } on DioException catch (e) {
+      print('❌ Error: ${e.message}');
+      throw Exception(e.response?.data['message'] ?? e.message);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  /// Upload Resume File to Backend (which uploads to Cloudinary)
+  static Future<ResumeModel> uploadResumeFile(File resumeFile) async {
+    try {
+      print('📤 Uploading resume to backend...');
+
+      // Create FormData with file
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          resumeFile.path,
+          filename: resumeFile.path.split('/').last,
+        ),
+      });
+
+      // Send to backend upload endpoint
+      final response = await _dio.post(
+        uploadResumeUrl,
+        data: formData,
+        options: Options(headers: _getAuthHeaders()),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+
+        if (data['success'] == true && data['data'] != null) {
+          final resume = ResumeModel.fromJson(data['data']);
+          print('✅ Resume uploaded successfully to backend');
+          return resume;
+        }
+
+        throw Exception(data['message'] ?? 'Failed to upload resume');
+      }
+
+      throw Exception('Failed with status ${response.statusCode}');
     } on DioException catch (e) {
       print('❌ Error: ${e.message}');
       throw Exception(e.response?.data['message'] ?? e.message);

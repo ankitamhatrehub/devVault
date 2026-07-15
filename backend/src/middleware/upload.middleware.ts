@@ -20,10 +20,10 @@ const fileFilter = (
   // The callback function tells Multer if the file is accepted or rejected
   cb: FileFilterCallback,
 ) => {
-  // Check if the file format starts with the word "image/" or "video/"
+  // Check if the file format is image, video, or PDF
   if (
     file.mimetype.startsWith("image/") ||
-    file.mimetype.startsWith("video/")
+    file.mimetype === "application/pdf"
   ) {
     // Accept the file by sending 'null' for error and 'true' for success
     cb(null, true);
@@ -31,7 +31,7 @@ const fileFilter = (
     // Reject the file by sending 'null' for error and 'false' for success
     cb(null, false);
     // Send back a clear Error object explaining why the file was rejected
-    cb(new Error("Invalid file type. Only images and videos are supported!"));
+    cb(new Error("Invalid file type. Only images,  and PDFs are supported!"));
   }
 };
 
@@ -39,7 +39,7 @@ const fileFilter = (
 export const upload = multer({
   // Use our RAM-based temporary storage configuration
   storage,
-  // Use our function that only allows images and videos
+  // Use our function that only allows images 
   fileFilter,
   // Set a strict size limit of 5 Megabytes (calculated in bytes)
   limits: { fileSize: 5 * 1024 * 1024 },

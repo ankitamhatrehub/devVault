@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dev_vault/data/services/resume_service.dart';
 import 'package:dev_vault/data/models/resume_model.dart';
 import 'package:flutter/material.dart';
@@ -99,37 +100,27 @@ class _ResumeScreenState extends State<ResumeScreen> {
       print('📤 Starting upload for: ${pickedFile.name}');
       _safeSetState(() => _state = ResumeState.uploading);
 
-      // Simulate file upload progress
-      for (int i = 0; i <= 100; i += 10) {
-        await Future.delayed(const Duration(milliseconds: 300));
-        _safeSetState(() => _uploadProgress = i / 100);
-      }
+      // Show uploading progress
+      _safeSetState(() => _uploadProgress = 0.3);
 
-      print('✅ File uploaded to Cloudinary');
-      _safeShowSnackBar('✅ Resume uploaded successfully', bgColor: Colors.green);
+      // Upload file to backend (which uploads to Cloudinary)
+      final file = File(pickedFile.path);
+      _safeSetState(() => _uploadProgress = 0.6);
 
-      // Wait a bit for backend to process
-      print('⏳ Waiting for backend to process...');
-      await Future.delayed(const Duration(seconds: 2));
+      final resume = await ResumeService.uploadResumeFile(file);
 
-      // TODO: After file is uploaded to Cloudinary, get the URL and call updateResume API
-      // Example:
-      // const fileUrl = "cloudinary_url";
-      // const fileSize = "file_size";
-      // const publicId = "cloudinary_public_id";
-      // final updatedResume = await ResumeService.updateResume(
-      //   fileName: pickedFile.name,
-      //   fileUrl: fileUrl,
-      //   fileSize: fileSize,
-      //   publicId: publicId,
-      // );
-      // _safeSetState(() {
-      //   _resumeData = updatedResume;
-      //   _state = ResumeState.uploaded;
-      // });
+      _safeSetState(() => _uploadProgress = 1.0);
 
-      print('🔄 Fetching updated resume...');
-      await _loadResume(isRetry: false);
+      // Update UI with new resume
+      _safeSetState(() {
+        _resumeData = resume;
+        _state = ResumeState.uploaded;
+      });
+
+      _safeShowSnackBar(
+        '✅ Resume uploaded successfully!',
+        bgColor: Colors.green,
+      );
     } catch (e) {
       print('❌ Error uploading resume: $e');
       print('Error details: ${e.toString()}');
@@ -147,7 +138,10 @@ class _ResumeScreenState extends State<ResumeScreen> {
 
       final Uri url = Uri.parse(_resumeData!.fileUrl);
       if (await url_launcher.canLaunchUrl(url)) {
-        await url_launcher.launchUrl(url, mode: url_launcher.LaunchMode.externalApplication);
+        await url_launcher.launchUrl(
+          url,
+          mode: url_launcher.LaunchMode.externalApplication,
+        );
       } else {
         _safeShowSnackBar('Could not open resume');
       }
@@ -162,7 +156,10 @@ class _ResumeScreenState extends State<ResumeScreen> {
       _safeSetState(() => _isLoading = true);
       final resume = await ResumeService.downloadResume();
       _safeSetState(() => _isLoading = false);
-      _safeShowSnackBar('📥 Downloading ${resume.fileName}...', bgColor: Colors.green);
+      _safeShowSnackBar(
+        '📥 Downloading ${resume.fileName}...',
+        bgColor: Colors.green,
+      );
       await _previewResume();
     } catch (e) {
       print('❌ Error downloading resume: $e');
@@ -247,7 +244,10 @@ class _ResumeScreenState extends State<ResumeScreen> {
                   _state = ResumeState.empty;
                   _resumeData = null;
                 });
-                _safeShowSnackBar('✅ Resume deleted successfully', bgColor: Colors.green);
+                _safeShowSnackBar(
+                  '✅ Resume deleted successfully',
+                  bgColor: Colors.green,
+                );
               } catch (e) {
                 print('❌ Error deleting resume: $e');
                 _safeSetState(() => _isLoading = false);
@@ -279,7 +279,7 @@ class _ResumeScreenState extends State<ResumeScreen> {
       'September',
       'October',
       'November',
-      'December'
+      'December',
     ];
     return months[month - 1];
   }
