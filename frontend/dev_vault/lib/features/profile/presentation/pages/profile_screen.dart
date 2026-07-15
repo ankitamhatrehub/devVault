@@ -167,10 +167,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         IconButton(
                           onPressed: () async {
                             print('✏️ Opening edit profile screen');
-                            print('   Profile will be fetched from API');
+                            print('   Passing profile data: ${_profile?.name}');
 
                             final result = await context.push<bool?>(
                               Routes.editProfile,
+                              extra: _profile,
                             );
                             if (result == true) {
                               print('🔄 Reloading profile after edit');

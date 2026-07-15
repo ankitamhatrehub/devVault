@@ -9,37 +9,33 @@ export const updateprofileService = async (
   updateData: {
     name: string;
     email: string;
-    bio?: String;
-    designation: String;
-    experience: String;
-    currentCompany?: String;
-    location: String;
-
+    bio?: string;
+    designation: string;
+    experience: string;
+    currentComapny?: string;
+    location: string;
   },
-  // name,
-  // email,
-  // bio,
-  // designation,
-  // experience,
-  // currentCompany,
-  // location,
 ) => {
   try {
-    logger.info(
-      "user id is => " +
-        userId +
-        "    and updated requested data " +
-        updateData,
-    );
+    logger.info(`updateprofileService: Updating user ${userId}`);
+    logger.info(`Update data:`, updateData);
+
     const userIdService = await AuthSchema.findByIdAndUpdate(
       userId,
       updateData,
       { new: true },
     ).select("-password");
-    logger.info("usser updated data => " + updateData);
+
+    if (!userIdService) {
+      logger.warn(`updateprofileService: User not found ${userId}`);
+      throw Error("User not found");
+    }
+
+    logger.info(`updateprofileService: User updated successfully`);
     return userIdService;
   } catch (error) {
-    throw Error("profile api has data or service related issue");
+    logger.error(`updateprofileService error: ${error}`);
+    throw Error(`Profile update failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 };
 export const changePasswordProfile = async (userId: string) => {};
