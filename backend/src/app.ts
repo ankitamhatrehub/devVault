@@ -42,11 +42,15 @@ app.use(cors({
 // Example: POST /api/auth/register, GET /api/projects, etc.
 app.use("/api", router);
 app.get("/", (req, res) => {
-  res.json({
+  res.status(200).json({
     success: true,
-    app: "Ankita's DevVault Backend",
-    status: "Live 🚀",
-    version: "1.0.0",
+    project: "DevVault",
+    tagline: "Your Personal Developer Career Companion 🚀",
+    description:
+      "Manage your learning, projects, tasks, notes, profile, and resume from a single platform.",
+    developer: "Ankita Shelke",
+    status: "Live",
+    version: "v1.0.0",
   });
 });
 // Health check endpoint for monitoring server status
