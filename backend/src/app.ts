@@ -41,7 +41,14 @@ app.use(cors({
 // Routes: Mount all API routes under /api prefix
 // Example: POST /api/auth/register, GET /api/projects, etc.
 app.use("/api", router);
-
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    app: "Ankita's DevVault Backend",
+    status: "Live 🚀",
+    version: "1.0.0",
+  });
+});
 // Health check endpoint for monitoring server status
 app.get("/health", (_req, res) => {
   res.status(200).json({
