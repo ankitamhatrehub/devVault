@@ -108,7 +108,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
       // If editing, navigate to tasks screen; if creating, just pop back
       if (widget.task != null) {
-        context.go(Routes.tasks);
+        context.replace(Routes.tasks);
       } else {
         Navigator.pop(context, true);
       }

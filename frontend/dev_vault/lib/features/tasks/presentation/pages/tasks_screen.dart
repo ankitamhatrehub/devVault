@@ -5,6 +5,7 @@ import 'package:dev_vault/data/services/tasks_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../widgets/widgets.dart';
@@ -100,7 +101,13 @@ Future<void> _deleteTask(String id) async {
         title: const Text('Today\'s Tasks'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(Routes.dashboard);
+            }
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
