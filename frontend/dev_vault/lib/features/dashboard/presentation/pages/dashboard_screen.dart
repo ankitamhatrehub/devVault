@@ -156,10 +156,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       GlassCard(
                         title: 'Today\'s focus',
                         subtitle:
-                            _dashboard?.todayFocus?.toString() ??
+                            (_dashboard?.todayFocus?['title'] as String?) ??
                             'No focus set',
                         trailing: const Text('2h 15m'),
-                        child: const LinearProgressIndicator(value: 0.6),
+                        child: LinearProgressIndicator(
+                          value: ((((_dashboard?.todayFocus?['progress'] ?? 0) as num).toDouble() / 100).clamp(0, 1)),
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.md),
                       const SectionHeader(title: 'Quick actions'),
@@ -199,6 +201,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         )
                       else
                         ...(_dashboard?.recentProjects ?? []).map((project) {
+                          final progressValue = ((project['progress'] ?? 0) as num).toDouble();
+                          final normalizedProgress = progressValue > 1
+                              ? (progressValue / 100).clamp(0.0, 1.0)
+                              : progressValue.clamp(0.0, 1.0);
+
                           return Padding(
                             padding: const EdgeInsets.only(
                               bottom: AppSpacing.sm,
@@ -209,11 +216,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 name: project['projectName'] ?? 'Untitled',
                                 status: project['status'] ?? 'In progress',
                                 stack: project['primaryStack'] ?? 'Unknown',
-                                progress:
-                                    (((project['progress'] ?? 0) as num)
-                                                .toDouble() /
-                                            100)
-                                        .clamp(0, 1),
+                                progress: normalizedProgress,
                                 deadline: project['deadline'] ?? '2026-07-28',
                                 onTap: () => context.push(Routes.projects),
                               ),
@@ -235,20 +238,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       if ((_dashboard?.recentTasks ?? []).isEmpty)
                         TaskPreview()
                       else ...[
-                        TaskPreview(
-                          title: _dashboard!.recentTasks[0]['title'] ?? '',
-                          description:
-                              _dashboard!.recentTasks[0]['description'],
-                          priority: _dashboard!.recentTasks[0]['priority'],
-                          status: _dashboard!.recentTasks[0]['status'],
-                          dueDate: _dashboard!.recentTasks[0]['dueDate'],
-                          progress:
-                              ((((_dashboard!.recentTasks[0]['progress'] ?? 0)
-                                              as num)
-                                          .toDouble() /
-                                      100)
-                                  .clamp(0, 1)),
-                        ),
+                        ...(_dashboard?.recentTasks ?? []).take(2).map((task) {
+                          final progressValue = ((task['progress'] ?? 0) as num).toDouble();
+                          final normalizedProgress = progressValue > 1
+                              ? (progressValue / 100).clamp(0.0, 1.0)
+                              : progressValue.clamp(0.0, 1.0);
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                            child: TaskPreview(
+                              title: task['title'] ?? 'Untitled',
+                              description: task['description'],
+                              priority: task['priority'],
+                              status: task['status'],
+                              dueDate: task['dueDate'],
+                              progress: normalizedProgress,
+                            ),
+                          );
+                        }),
                       ],
                     ],
                   ),
