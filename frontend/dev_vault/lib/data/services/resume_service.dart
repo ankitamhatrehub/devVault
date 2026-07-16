@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../constant_urls.dart';
 import '../models/resume_model.dart';
@@ -140,6 +141,72 @@ class ResumeService {
       print('❌ Error: ${e.message}');
       throw Exception(e.response?.data['message'] ?? e.message);
     } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  /// Download Resume File as bytes (actual PDF file from backend)
+  static Future<List<int>> downloadResumeFile() async {
+    try {
+      print('📥 [1/4] Starting resume file download...');
+      print('📥 URL: $downloadResumeUrl');
+
+      final headers = _getAuthHeaders();
+      print('📥 [2/4] Auth headers prepared');
+      final authValue = headers['Authorization'] ?? '';
+      print('📥 Authorization: ${authValue.isNotEmpty ? authValue.substring(0, 20) + '...' : 'EMPTY'}');
+
+      final response = await _dio.get(
+        downloadResumeUrl,
+        options: Options(
+          headers: headers,
+          responseType: ResponseType.bytes,
+        ),
+      );
+
+      print('📥 [3/4] Response received');
+      print('📥 Status code: ${response.statusCode}');
+      print('📥 Content type: ${response.headers['content-type']}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final bytes = response.data as List<int>;
+        print('✅ [4/4] Resume file downloaded successfully - ${bytes.length} bytes');
+        return bytes;
+      } else {
+        throw Exception('Failed with status ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      print('❌ DioException occurred');
+      print('❌ Message: ${e.message}');
+      print('❌ Type: ${e.type}');
+      print('❌ Status code: ${e.response?.statusCode}');
+
+      String errorMessage = e.message ?? 'Unknown error';
+
+      if (e.response?.data != null) {
+        try {
+          final responseData = e.response!.data;
+          print('❌ Response data type: ${responseData.runtimeType}');
+          print('❌ Response data: $responseData');
+
+          // If response is bytes, decode to string then parse JSON
+          if (responseData is List<int>) {
+            final decodedString = utf8.decode(responseData);
+            print('❌ Decoded response: $decodedString');
+            final jsonData = jsonDecode(decodedString);
+            errorMessage = jsonData['message'] ?? errorMessage;
+          } else if (responseData is Map) {
+            errorMessage = responseData['message'] ?? errorMessage;
+          }
+        } catch (parseError) {
+          print('❌ Could not parse error response: $parseError');
+        }
+      }
+
+      throw Exception(errorMessage);
+    } catch (e) {
+      print('❌ Unexpected error: $e');
+      print('❌ Error type: ${e.runtimeType}');
       throw Exception(e.toString());
     }
   }

@@ -197,18 +197,50 @@ export const downloadResumeController = async (req: Request, res: Response) => {
     }
 
     // Fetch the actual file from Cloudinary URL
-    const fileUrl = data.fileUrl;
-    logger.info(`downloadResumeController: Fetching file from URL: ${fileUrl}`);
+    let fileUrl = data.fileUrl;
+    logger.info(`downloadResumeController: [1/3] Fetching file from URL: ${fileUrl}`);
 
-    const fileResponse = await fetch(fileUrl);
+    // Add download parameter to Cloudinary URL if not already present
+    if (!fileUrl.includes('?dl=1') && !fileUrl.includes('dl=1')) {
+      fileUrl = fileUrl + '?dl=1';
+      logger.info(`downloadResumeController: Modified URL with dl=1 parameter: ${fileUrl}`);
+    }
+
+    let fileResponse;
+    try {
+      // Add headers to Cloudinary request
+      const fetchOptions = {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': '*/*',
+        },
+      };
+
+      logger.info(`downloadResumeController: Fetching with options...`);
+
+      fileResponse = await fetch(fileUrl, fetchOptions);
+      logger.info(`downloadResumeController: [2/3] Response received - Status: ${fileResponse.status}`);
+      logger.info(`downloadResumeController: Content-Type: ${fileResponse.headers.get('content-type')}`);
+      logger.info(`downloadResumeController: Content-Length: ${fileResponse.headers.get('content-length')}`);
+    } catch (fetchError) {
+      logger.error(`downloadResumeController: Fetch error - ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
+      return res.status(500).json({
+        success: false,
+        message: `Failed to connect to storage: ${fetchError instanceof Error ? fetchError.message : 'Unknown error'}`,
+        data: null,
+      });
+    }
 
     if (!fileResponse.ok) {
+      const errorText = await fileResponse.text();
       logger.error(
         `downloadResumeController: Failed to fetch file from Cloudinary - Status: ${fileResponse.status}`,
       );
+      logger.error(`downloadResumeController: Cloudinary response: ${errorText}`);
       return res.status(500).json({
         success: false,
-        message: "Failed to download file from storage",
+        message: `Failed to download file from storage (Status: ${fileResponse.status})`,
         data: null,
       });
     }
@@ -217,7 +249,7 @@ export const downloadResumeController = async (req: Request, res: Response) => {
     const buffer = Buffer.from(fileBuffer);
 
     logger.info(
-      `downloadResumeController: Successfully fetched file, size: ${buffer.length} bytes`,
+      `downloadResumeController: [3/3] Successfully fetched file, size: ${buffer.length} bytes`,
     );
 
     // Return file with proper headers

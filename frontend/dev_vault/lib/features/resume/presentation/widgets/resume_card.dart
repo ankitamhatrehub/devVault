@@ -109,12 +109,12 @@ class ResumeCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                if (onPreview != null)
-                  _ActionButton(
-                    icon: Icons.visibility_outlined,
-                    label: 'Preview',
-                    onPressed: onPreview!,
-                  ),
+                // if (onPreview != null)
+                //   _ActionButton(
+                //     icon: Icons.visibility_outlined,
+                //     label: 'Preview',
+                //     onPressed: onPreview!,
+                //   ),
                 if (onDownload != null)
                   _ActionButton(
                     icon: Icons.download_outlined,

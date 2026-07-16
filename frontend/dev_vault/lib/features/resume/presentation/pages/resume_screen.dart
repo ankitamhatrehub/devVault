@@ -4,7 +4,6 @@ import 'package:dev_vault/data/models/resume_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dio/dio.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../widgets/resume_empty_state.dart';
 import '../widgets/resume_card.dart';
@@ -147,39 +146,45 @@ class _ResumeScreenState extends State<ResumeScreen> {
   Future<void> _downloadResume() async {
     try {
       _safeSetState(() => _isLoading = true);
-      print("📥 Starting download via backend...");
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      print("📥 [Screen] Starting download via backend...");
 
-      // Download file bytes from backend endpoint
-      final dio = Dio();
       final fileName = _resumeData?.fileName ?? 'resume.pdf';
       final tempDir = Directory.systemTemp;
       final filePath = '${tempDir.path}/$fileName';
 
-      print("📁 File name: $fileName");
-      print("📁 Saving to: $filePath");
-      print("📥 Downloading from backend...");
+      print("📁 [Screen] File name: $fileName");
+      print("📁 [Screen] Saving to: $filePath");
+      print("📥 [Screen] Calling ResumeService.downloadResumeFile()...");
 
-      // Download from backend - returns PDF bytes
-      await dio.download(
-        'http://192.168.0.105:3000/api/resume/downloadResume',
-        filePath,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            final progress = (received / total * 100).toStringAsFixed(0);
-            print('📊 Progress: $progress%');
-          }
-        },
-      );
+      // Download file bytes using ResumeService
+      final fileBytes = await ResumeService.downloadResumeFile();
+
+      print("📥 [Screen] Received ${fileBytes.length} bytes from service");
+      print("📝 [Screen] Writing bytes to file...");
+
+      // Write bytes to file
+      final file = File(filePath);
+      await file.writeAsBytes(fileBytes);
+
+      print("✅ [Screen] File written successfully");
+      print("📊 [Screen] File size on disk: ${await file.length()} bytes");
+      print("📊 [Screen] File exists: ${await file.exists()}");
 
       _safeSetState(() => _isLoading = false);
 
-      print("✅ Download complete!");
+      print("✅ [Screen] Download complete!");
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       _safeShowSnackBar(
         '✅ Downloaded: $fileName\nSaved to: $filePath',
         bgColor: Colors.green,
       );
     } catch (e) {
-      print('❌ Download error: $e');
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      print('❌ [Screen] Download error: $e');
+      print('❌ [Screen] Error type: ${e.runtimeType}');
+      print('❌ [Screen] Stack trace: ${e.toString()}');
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       _safeSetState(() => _isLoading = false);
       _safeShowSnackBar('Download failed: ${e.toString()}');
     }

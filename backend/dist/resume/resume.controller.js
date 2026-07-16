@@ -138,12 +138,24 @@ export const downloadResumeController = async (req, res) => {
                 data: null,
             });
         }
-        logger.info(`downloadResumeController: Resume retrieved successfully for user ${userId}`);
-        return res.status(200).json({
-            success: true,
-            message: "Resume retrieved successfully",
-            data: data,
-        });
+        const fileUrl = data.fileUrl;
+        logger.info(`downloadResumeController: Fetching file from URL: ${fileUrl}`);
+        const fileResponse = await fetch(fileUrl);
+        if (!fileResponse.ok) {
+            logger.error(`downloadResumeController: Failed to fetch file from Cloudinary - Status: ${fileResponse.status}`);
+            return res.status(500).json({
+                success: false,
+                message: "Failed to download file from storage",
+                data: null,
+            });
+        }
+        const fileBuffer = await fileResponse.arrayBuffer();
+        const buffer = Buffer.from(fileBuffer);
+        logger.info(`downloadResumeController: Successfully fetched file, size: ${buffer.length} bytes`);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename="${data.fileName}"`);
+        res.setHeader("Content-Length", buffer.length);
+        return res.send(buffer);
     }
     catch (error) {
         logger.error(`downloadResumeController: Exception occurred - ${error instanceof Error ? error.message : String(error)}`);
