@@ -46,13 +46,13 @@ export const getDashboardService = async (userId: string): Promise<DashboardResp
 
       // Fetch latest 5 projects
       ProjectsModel.find({ userId, deletedAt: null })
-        .select("projectName summary status deadline progress createdAt")
+        .select("projectName summary primaryStack status deadline teamSize projectNotes focusTags progress createdAt")
         .sort({ createdAt: -1 })
         .limit(5),
 
       // Fetch latest 5 tasks
       TasksModel.find({ userId, deletedAt: null })
-        .select("title description status priority dueDate progress createdAt")
+        .select("title description category priority status dueDate progress createdAt")
         .sort({ createdAt: -1 })
         .limit(5),
     ]);
