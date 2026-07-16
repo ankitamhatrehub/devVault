@@ -4,7 +4,7 @@ import 'package:dev_vault/data/models/resume_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:url_launcher/url_launcher.dart' as url_launcher;
+import 'package:dio/dio.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../widgets/resume_empty_state.dart';
 import '../widgets/resume_card.dart';
@@ -129,55 +129,62 @@ class _ResumeScreenState extends State<ResumeScreen> {
     }
   }
 
-  Future<void> _previewResume() async {
+  // Preview function commented out - using download instead
+  // Future<void> _previewResume() async {
+  //   try {
+  //     if (_resumeData?.fileUrl == null || _resumeData!.fileUrl.isEmpty) {
+  //       _safeShowSnackBar('Resume URL not available');
+  //       return;
+  //     }
+  //     print("📄 Resume URL: ${_resumeData?.fileUrl}");
+  //     // Preview implementation commented out
+  //   } catch (e) {
+  //     print('❌ Error previewing resume: $e');
+  //     _safeShowSnackBar('Error: ${e.toString()}');
+  //   }
+  // }
+
+  Future<void> _downloadResume() async {
     try {
       if (_resumeData?.fileUrl == null || _resumeData!.fileUrl.isEmpty) {
         _safeShowSnackBar('Resume URL not available');
         return;
       }
 
-      print("📄 Resume URL: ${_resumeData?.fileUrl}");
-
-      final urlString = _resumeData!.fileUrl.trim();
-      print("📄 Trimmed URL: $urlString");
-
-      // Ensure URL has proper scheme
-      final pdfUrl = urlString.startsWith('http') ? urlString : 'https://$urlString';
-      print("📄 PDF URL: $pdfUrl");
-
-      // Use Google Drive PDF viewer to display the PDF
-      // This works for any publicly accessible PDF URL
-      final encodedUrl = Uri.encodeComponent(pdfUrl);
-      final googleDriveViewerUrl = 'https://drive.google.com/viewerng/viewer?embedded=true&url=$encodedUrl';
-
-      print("📄 Google Drive Viewer URL: $googleDriveViewerUrl");
-
-      // Open in in-app WebView
-      await url_launcher.launchUrl(
-        Uri.parse(googleDriveViewerUrl),
-        mode: url_launcher.LaunchMode.inAppWebView,
-        webViewConfiguration: const url_launcher.WebViewConfiguration(
-          enableJavaScript: true,
-        ),
-      );
-    } catch (e) {
-      print('❌ Error previewing resume: $e');
-      _safeShowSnackBar('Error: ${e.toString()}');
-    }
-  }
-
-  Future<void> _downloadResume() async {
-    try {
       _safeSetState(() => _isLoading = true);
-      final resume = await ResumeService.downloadResume();
+      print("📥 Starting download from Cloudinary...");
+
+      // Use the direct Cloudinary URL - no authentication needed
+      final pdfUrl = _resumeData!.fileUrl;
+      final fileName = _resumeData!.fileName;
+      final tempDir = Directory.systemTemp;
+      final filePath = '${tempDir.path}/$fileName';
+
+      print("📁 URL: $pdfUrl");
+      print("📁 Saving to: $filePath");
+
+      // Download directly from Cloudinary URL using dio
+      final dio = Dio();
+      await dio.download(
+        pdfUrl,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            final progress = (received / total * 100).toStringAsFixed(0);
+            print('📊 Progress: $progress%');
+          }
+        },
+      );
+
       _safeSetState(() => _isLoading = false);
+
+      print("✅ Download complete!");
       _safeShowSnackBar(
-        '📥 Downloading ${resume.fileName}...',
+        '✅ Downloaded: $fileName\nLocation: $filePath',
         bgColor: Colors.green,
       );
-      await _previewResume();
     } catch (e) {
-      print('❌ Error downloading resume: $e');
+      print('❌ Download error: $e');
       _safeSetState(() => _isLoading = false);
       _safeShowSnackBar('Download failed: ${e.toString()}');
     }
@@ -370,7 +377,8 @@ class _ResumeScreenState extends State<ResumeScreen> {
                 fileType: 'PDF',
                 fileSize: _resumeData!.fileSize,
                 uploadDate: _formatDate(_resumeData!.uploadedAt),
-                onPreview: _isLoading ? null : _previewResume,
+                // Preview button disabled - download only
+                onPreview: null,
                 onDownload: _isLoading ? null : _downloadResume,
                 onReplace: _isLoading ? null : _replaceResume,
                 onDelete: _isLoading ? null : _deleteResume,
