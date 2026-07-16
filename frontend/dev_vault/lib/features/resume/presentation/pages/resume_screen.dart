@@ -146,25 +146,23 @@ class _ResumeScreenState extends State<ResumeScreen> {
 
   Future<void> _downloadResume() async {
     try {
-      if (_resumeData?.fileUrl == null || _resumeData!.fileUrl.isEmpty) {
-        _safeShowSnackBar('Resume URL not available');
-        return;
-      }
-
       _safeSetState(() => _isLoading = true);
-      print("📥 Starting download from Cloudinary...");
+      print("📥 Downloading resume via backend...");
 
-      // Use the direct Cloudinary URL - no authentication needed
-      final pdfUrl = _resumeData!.fileUrl;
-      final fileName = _resumeData!.fileName;
+      // Use backend endpoint to download with authentication
+      await ResumeService.downloadResume();
+
+      // Get file name and save to temp directory
+      final fileName = _resumeData?.fileName ?? 'resume.pdf';
       final tempDir = Directory.systemTemp;
       final filePath = '${tempDir.path}/$fileName';
 
-      print("📁 URL: $pdfUrl");
       print("📁 Saving to: $filePath");
 
-      // Download directly from Cloudinary URL using dio
+      // The backend returns the resume model, now download the file directly
+      final pdfUrl = _resumeData!.fileUrl;
       final dio = Dio();
+
       await dio.download(
         pdfUrl,
         filePath,
@@ -180,7 +178,7 @@ class _ResumeScreenState extends State<ResumeScreen> {
 
       print("✅ Download complete!");
       _safeShowSnackBar(
-        '✅ Downloaded: $fileName\nLocation: $filePath',
+        '✅ Downloaded: $fileName\nSaved to: $filePath',
         bgColor: Colors.green,
       );
     } catch (e) {
