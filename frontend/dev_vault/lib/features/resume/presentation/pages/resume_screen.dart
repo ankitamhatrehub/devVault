@@ -136,15 +136,26 @@ class _ResumeScreenState extends State<ResumeScreen> {
         return;
       }
 
-      final Uri url = Uri.parse(_resumeData!.fileUrl);
-      if (await url_launcher.canLaunchUrl(url)) {
-        await url_launcher.launchUrl(
-          url,
-          mode: url_launcher.LaunchMode.externalApplication,
-        );
-      } else {
-        _safeShowSnackBar('Could not open resume');
-      }
+      print("📄 Resume URL: ${_resumeData?.fileUrl}");
+
+      final urlString = _resumeData!.fileUrl.trim();
+      print("📄 Trimmed URL: $urlString");
+
+      // Ensure URL has proper scheme
+      final urlToOpen = urlString.startsWith('http') ? urlString : 'https://$urlString';
+      final Uri url = Uri.parse(urlToOpen);
+
+      print("📄 Parsed URI: $url");
+
+      // Open PDF in in-app WebView (most reliable method)
+      print("📄 Opening in WebView: $url");
+      await url_launcher.launchUrl(
+        url,
+        mode: url_launcher.LaunchMode.inAppWebView,
+        webViewConfiguration: const url_launcher.WebViewConfiguration(
+          enableJavaScript: true,
+        ),
+      );
     } catch (e) {
       print('❌ Error previewing resume: $e');
       _safeShowSnackBar('Error: ${e.toString()}');
