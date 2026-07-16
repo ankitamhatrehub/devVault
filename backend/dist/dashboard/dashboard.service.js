@@ -8,18 +8,18 @@ export const getDashboardService = async (userId) => {
         const today = new Date().toISOString().split("T")[0];
         const [totalProjects, activeProjects, completedTasks, pendingTasks, learningCount, todayFocusTask, oldestPendingTask, recentProjects, recentTasks] = await Promise.all([
             ProjectsModel.countDocuments({ userId, deletedAt: null }),
-            ProjectsModel.countDocuments({ userId, status: "Active", deletedAt: null }),
+            ProjectsModel.countDocuments({ userId, status: { $in: ["In review", "Shipping soon"] }, deletedAt: null }),
             TasksModel.countDocuments({ userId, status: "Completed", deletedAt: null }),
-            TasksModel.countDocuments({ userId, status: "Pending", deletedAt: null }),
+            TasksModel.countDocuments({ userId, status: { $in: ["Pending", "In Progress"] }, deletedAt: null }),
             LearningModel.countDocuments({ userId, deletedAt: null }),
             TasksModel.findOne({ userId, dueDate: today, status: "Pending", deletedAt: null }).sort({ createdAt: -1 }).limit(1),
             TasksModel.findOne({ userId, status: "Pending", deletedAt: null }).sort({ createdAt: 1 }).limit(1),
             ProjectsModel.find({ userId, deletedAt: null })
-                .select("projectName summary status deadline progress createdAt")
+                .select("projectName summary primaryStack status deadline teamSize projectNotes focusTags progress createdAt")
                 .sort({ createdAt: -1 })
                 .limit(5),
             TasksModel.find({ userId, deletedAt: null })
-                .select("title description status priority dueDate progress createdAt")
+                .select("title description category priority status dueDate progress createdAt")
                 .sort({ createdAt: -1 })
                 .limit(5),
         ]);

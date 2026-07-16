@@ -15,6 +15,17 @@ app.use(cors({
     credentials: true,
 }));
 app.use("/api", router);
+app.get("/", (req, res) => {
+    res.status(200).json({
+        success: true,
+        project: "DevVault",
+        tagline: "Your Personal Developer Career Companion 🚀",
+        description: "Manage your learning, projects, tasks, notes, profile, and resume from a single platform.",
+        developer: "Ankita Shelke",
+        status: "Live",
+        version: "v1.0.0",
+    });
+});
 app.get("/health", (_req, res) => {
     res.status(200).json({
         status: "healthy",
