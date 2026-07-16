@@ -1,9 +1,7 @@
 import 'package:dev_vault/data/models/tasks_model.dart';
 import 'package:dev_vault/data/services/tasks_service.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_service.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -99,6 +97,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
       if (!mounted) return;
 
+      if (!mounted) return;
+
       SnackBarService.showSuccess(
         context,
         message: widget.task == null
@@ -106,10 +106,15 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
           : 'Task updated successfully',
       );
 
-      // If editing, navigate to tasks screen; if creating, just pop back
+      // If editing, pop back to tasks screen (skip detail screen)
       if (widget.task != null) {
-        context.replace(Routes.tasks);
+        // Pop task form, then pop task detail screen to get back to tasks list
+        Navigator.pop(context, true);
+        if (mounted) {
+          Navigator.pop(context);
+        }
       } else {
+        // If creating, just pop back normally
         Navigator.pop(context, true);
       }
     } catch (e) {
