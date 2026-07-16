@@ -26,14 +26,14 @@ export const getDashboardService = async (userId: string): Promise<DashboardResp
       // Count total projects (excluding soft-deleted)
       ProjectsModel.countDocuments({ userId, deletedAt: null }),
 
-      // Count active projects only
-      ProjectsModel.countDocuments({ userId, status: "Active", deletedAt: null }),
+      // Count active projects (In review or Shipping soon, not Planning)
+      ProjectsModel.countDocuments({ userId, status: { $in: ["In review", "Shipping soon"] }, deletedAt: null }),
 
       // Count completed tasks (assuming status = "Completed" or "Done")
       TasksModel.countDocuments({ userId, status: "Completed", deletedAt: null }),
 
-      // Count pending tasks (assuming status = "Pending" or "In Progress")
-      TasksModel.countDocuments({ userId, status: "Pending", deletedAt: null }),
+      // Count pending tasks (status = "Pending" or "In Progress")
+      TasksModel.countDocuments({ userId, status: { $in: ["Pending", "In Progress"] }, deletedAt: null }),
 
       // Count total learning roadmaps
       LearningModel.countDocuments({ userId, deletedAt: null }),
