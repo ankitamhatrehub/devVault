@@ -206,11 +206,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: GestureDetector(
                               onTap: () => context.push(Routes.projects),
                               child: ProjectTile(
-                                name: project['name'] ?? 'Untitled',
+                                name: project['projectName'] ?? 'Untitled',
                                 status: project['status'] ?? 'In progress',
-                                stack: project['stack'] ?? 'Unknown',
-                                progress: ((project['progress'] ?? 0) as num)
-                                    .toDouble(),
+                                stack: project['primaryStack'] ?? 'Unknown',
+                                progress:
+                                    (((project['progress'] ?? 0) as num)
+                                                .toDouble() /
+                                            100)
+                                        .clamp(0, 1),
                                 deadline: project['deadline'] ?? '2026-07-28',
                                 onTap: () => context.push(Routes.projects),
                               ),
@@ -240,9 +243,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           status: _dashboard!.recentTasks[0]['status'],
                           dueDate: _dashboard!.recentTasks[0]['dueDate'],
                           progress:
-                              ((_dashboard!.recentTasks[0]['progress'] ?? 0)
-                                      as num)
-                                  .toDouble(),
+                              ((((_dashboard!.recentTasks[0]['progress'] ?? 0)
+                                              as num)
+                                          .toDouble() /
+                                      100)
+                                  .clamp(0, 1)),
                         ),
                       ],
                     ],

@@ -78,8 +78,8 @@ class _SplashScreenState extends State<SplashScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 96,
-                    height: 96,
+                    width: 72,
+                    height: 72,
                     decoration: BoxDecoration(
                       color: AppColors.primarySoft,
                       borderRadius: BorderRadius.circular(AppRadius.large),
@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     child: const Icon(
                       Icons.lock_open_rounded,
-                      size: 44,
+                      size: 32,
                       color: AppColors.primary,
                     ),
                   ),
