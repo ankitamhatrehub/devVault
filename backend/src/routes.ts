@@ -3,15 +3,15 @@
 // All routes are prefixed with /api from app.ts
 
 import { Router } from "express";
-import auth from "../src/authentication/auth.routes.js";
-import profile from "../src/profile/profile.routes.js";
-import tasks from "../src/tasks/tasks.routes.js";
-import notes from "../src/notes/notes.routes.js";
-import projects from "../src/projects/projects.routes.js";
-// import interview from "../src/interview/interview.routes.js";
-import learning from "../src/learning/learning.routes.js";
-import dashboard from "../src/dashboard/dashboard.route.js";
-import resume from "../src/resume/resume.routes.js";
+import auth from "./authentication/auth.routes.js";
+import profile from "./profile/profile.routes.js";
+import tasks from "./tasks/tasks.routes.js";
+import notes from "./notes/notes.routes.js";
+import projects from "./projects/projects.routes.js";
+// import interview from "./interview/interview.routes.js";
+import learning from "./learning/learning.routes.js";
+import dashboard from "./dashboard/dashboard.route.js";
+import resume from "./resume/resume.routes.js";
 // Create a new Express router instance for handling API routes
 const router = Router();
 
