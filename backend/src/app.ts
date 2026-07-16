@@ -29,19 +29,12 @@ app.use(express.json({ limit: "10mb" }));
 // Middleware: Parse URL-encoded data from forms
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// TODO: Install cors and helmet packages for production security
-// npm install cors helmet @types/cors
-// Uncomment below lines once installed:
-/*
+// Import CORS for allowing cross-origin requests (required for web apps)
 import cors from "cors";
 app.use(cors({
   origin: process.env.CORS_ORIGIN || "*",
   credentials: true,
 }));
-
-import helmet from "helmet";
-app.use(helmet());
-*/
 
 // ========== ROUTES ==========
 

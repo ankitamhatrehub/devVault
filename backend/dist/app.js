@@ -9,6 +9,11 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+import cors from "cors";
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || "*",
+    credentials: true,
+}));
 app.use("/api", router);
 app.get("/health", (_req, res) => {
     res.status(200).json({

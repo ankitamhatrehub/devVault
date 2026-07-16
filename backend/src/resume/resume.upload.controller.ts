@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { upload, uploadToCloudinary } from "../middleware/upload.middleware";
-import ResumeSchema from "../resume/resume.model";
-import { logger } from "../config/logger";
+import { upload, uploadToCloudinary } from "../middleware/upload.middleware.js";
+import ResumeSchema from "../resume/resume.model.js";
+import { logger } from "../config/logger.js";
 
 export const uploadResumeController = async (req: Request, res: Response) => {
   try {
