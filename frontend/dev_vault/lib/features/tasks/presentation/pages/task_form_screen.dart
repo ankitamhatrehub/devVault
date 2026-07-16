@@ -215,6 +215,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                               });
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a priority.'
+                              : null,
                           decoration: const InputDecoration(
                             labelText: 'Priority',
                           ),
@@ -244,6 +248,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                               });
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a status.'
+                              : null,
                           decoration: const InputDecoration(
                             labelText: 'Status',
                           ),
@@ -254,6 +262,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                           labelText: 'Due date',
                           readOnly: true,
                           onTap: _pickDate,
+                          validator: (value) =>
+                              (value == null || value.trim().isEmpty)
+                              ? 'Please select a due date.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         DropdownButtonFormField<String>(
@@ -284,6 +296,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                               });
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a category.'
+                              : null,
                           decoration: const InputDecoration(
                             labelText: 'Category',
                           ),

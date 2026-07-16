@@ -138,6 +138,10 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
                               });
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a category.'
+                              : null,
                           decoration: const InputDecoration(
                             labelText: 'Category',
                           ),

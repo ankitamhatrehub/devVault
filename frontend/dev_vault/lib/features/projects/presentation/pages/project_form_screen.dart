@@ -215,6 +215,10 @@ Future<void> _save() async {
                               });
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a primary stack.'
+                              : null,
                           decoration: const InputDecoration(
                             labelText: 'Primary stack',
                           ),
@@ -244,6 +248,10 @@ Future<void> _save() async {
                               });
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a status.'
+                              : null,
                           decoration: const InputDecoration(
                             labelText: 'Status',
                           ),
@@ -254,6 +262,10 @@ Future<void> _save() async {
                           labelText: 'Deadline',
                           readOnly: true,
                           onTap: _pickDate,
+                          validator: (value) =>
+                              (value == null || value.trim().isEmpty)
+                              ? 'Please select a deadline.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         DropdownButtonFormField<String>(
@@ -284,35 +296,64 @@ Future<void> _save() async {
                               });
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select team size.'
+                              : null,
                           decoration: const InputDecoration(
                             labelText: 'Team size',
                           ),
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'Focus tags',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Wrap(
-                          spacing: AppSpacing.sm,
-                          children: _availableTags.map((tag) {
-                            final selected = _selectedTags.contains(tag);
-                            return ChoiceChip(
-                              label: Text(tag),
-                              selected: selected,
-                              onSelected: (_) {
-                                setState(() {
-                                  if (selected) {
-                                    _selectedTags.remove(tag);
-                                  } else {
-                                    _selectedTags.add(tag);
-                                  }
-                                  _isDirty = true;
-                                });
-                              },
+                        FormField<List<String>>(
+                          validator: (value) =>
+                              (_selectedTags.isEmpty)
+                              ? 'Please select at least one focus tag.'
+                              : null,
+                          builder: (FormFieldState<List<String>> state) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Focus tags',
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                Wrap(
+                                  spacing: AppSpacing.sm,
+                                  children: _availableTags.map((tag) {
+                                    final selected = _selectedTags.contains(tag);
+                                    return ChoiceChip(
+                                      label: Text(tag),
+                                      selected: selected,
+                                      onSelected: (_) {
+                                        setState(() {
+                                          if (selected) {
+                                            _selectedTags.remove(tag);
+                                          } else {
+                                            _selectedTags.add(tag);
+                                          }
+                                          state.didChange(_selectedTags);
+                                          _isDirty = true;
+                                        });
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                                if (state.hasError)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: AppSpacing.sm),
+                                    child: Text(
+                                      state.errorText ?? '',
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.error,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             );
-                          }).toList(),
+                          },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(

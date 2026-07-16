@@ -219,6 +219,10 @@ Future<void> _save() async {
                               setState(() => _category = value);
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a category.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         DropdownButtonFormField<String>(
@@ -245,6 +249,10 @@ Future<void> _save() async {
                               setState(() => _status = value);
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a status.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         DropdownButtonFormField<String>(
@@ -268,6 +276,10 @@ Future<void> _save() async {
                               setState(() => _priority = value);
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                              ? 'Please select a priority.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         AppTextField(
@@ -289,6 +301,10 @@ Future<void> _save() async {
                                   .first;
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.trim().isEmpty)
+                              ? 'Please select a start date.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
@@ -310,6 +326,10 @@ Future<void> _save() async {
                                   .first;
                             }
                           },
+                          validator: (value) =>
+                              (value == null || value.trim().isEmpty)
+                              ? 'Please select a target date.'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Text(
