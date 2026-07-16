@@ -53,16 +53,16 @@ npm install
 # Create .env file with required configuration
 cat > .env << EOF
 # Database
-MONGO_URI=mongodb+srv://your-user:your-password@cluster.mongodb.net/devvault?retryWrites=true&w=majority
+MONGO_URI=mongodb.....
 
 # JWT
-JWT_SECRET=your-jwt-secret-key-here
-JWT_EXPIRE=30d
+JWT_SECRET=your-jwt-secret-key-here.....
+JWT_EXPIRE=30d....
 
 # Cloudinary
-CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-api-key
-CLOUDINARY_API_SECRET=your-api-secret
+CLOUDINARY_CLOUD_NAME=your-cloud-name...
+CLOUDINARY_API_KEY=your-api-key...
+CLOUDINARY_API_SECRET=your-api-secret..
 
 # Server
 PORT=3000
@@ -93,7 +93,7 @@ flutter build web
 
 ### Cloudinary Configuration
 
-1. **Create a Cloudinary account** at https://cloudinary.com
+1. **Create a Cloudinary account** at 
 2. **Enable PDF delivery** in Security settings:
    - Go to Settings → Security
    - Check "Allow delivery of PDF and ZIP files"
@@ -150,7 +150,7 @@ Update `backend/.env` with:
 
 Edit `frontend/dev_vault/lib/data/constant_urls.dart`:
 ```dart
-const String baseUrl = "http://192.168.0.105:3000/api/";
+const String baseUrl = "";
 ```
 
 Update the base URL to match your backend server.
