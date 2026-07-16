@@ -1,7 +1,7 @@
 # Node
 backend/node_modules/
 backend/.env
-
+backend/dist/
 # Flutter
 frontend/.dart_tool/
 frontend/build/
