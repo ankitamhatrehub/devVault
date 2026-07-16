@@ -142,15 +142,19 @@ class _ResumeScreenState extends State<ResumeScreen> {
       print("📄 Trimmed URL: $urlString");
 
       // Ensure URL has proper scheme
-      final urlToOpen = urlString.startsWith('http') ? urlString : 'https://$urlString';
-      final Uri url = Uri.parse(urlToOpen);
+      final pdfUrl = urlString.startsWith('http') ? urlString : 'https://$urlString';
+      print("📄 PDF URL: $pdfUrl");
 
-      print("📄 Parsed URI: $url");
+      // Use Google Drive PDF viewer to display the PDF
+      // This works for any publicly accessible PDF URL
+      final encodedUrl = Uri.encodeComponent(pdfUrl);
+      final googleDriveViewerUrl = 'https://drive.google.com/viewerng/viewer?embedded=true&url=$encodedUrl';
 
-      // Open PDF in in-app WebView (most reliable method)
-      print("📄 Opening in WebView: $url");
+      print("📄 Google Drive Viewer URL: $googleDriveViewerUrl");
+
+      // Open in in-app WebView
       await url_launcher.launchUrl(
-        url,
+        Uri.parse(googleDriveViewerUrl),
         mode: url_launcher.LaunchMode.inAppWebView,
         webViewConfiguration: const url_launcher.WebViewConfiguration(
           enableJavaScript: true,
