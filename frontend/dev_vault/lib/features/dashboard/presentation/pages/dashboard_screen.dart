@@ -160,7 +160,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             'No focus set',
                         trailing: const Text('2h 15m'),
                         child: LinearProgressIndicator(
-                          value: ((((_dashboard?.todayFocus?['progress'] ?? 0) as num).toDouble() / 100).clamp(0, 1)),
+                          value:
+                              ((((_dashboard?.todayFocus?['progress'] ?? 0)
+                                              as num)
+                                          .toDouble() /
+                                      100)
+                                  .clamp(0, 1)),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
@@ -201,7 +206,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         )
                       else
                         ...(_dashboard?.recentProjects ?? []).map((project) {
-                          final progressValue = ((project['progress'] ?? 0) as num).toDouble();
+                          final progressValue =
+                              ((project['progress'] ?? 0) as num).toDouble();
                           final normalizedProgress = progressValue > 1
                               ? (progressValue / 100).clamp(0.0, 1.0)
                               : progressValue.clamp(0.0, 1.0);
@@ -239,13 +245,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         TaskPreview()
                       else ...[
                         ...(_dashboard?.recentTasks ?? []).take(2).map((task) {
-                          final progressValue = ((task['progress'] ?? 0) as num).toDouble();
+                          final progressValue = ((task['progress'] ?? 0) as num)
+                              .toDouble();
                           final normalizedProgress = progressValue > 1
                               ? (progressValue / 100).clamp(0.0, 1.0)
                               : progressValue.clamp(0.0, 1.0);
 
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                            padding: const EdgeInsets.only(
+                              bottom: AppSpacing.sm,
+                            ),
                             child: TaskPreview(
                               title: task['title'] ?? 'Untitled',
                               description: task['description'],
