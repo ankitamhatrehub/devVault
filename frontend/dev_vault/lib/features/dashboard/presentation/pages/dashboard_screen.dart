@@ -211,7 +211,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           final normalizedProgress = progressValue > 1
                               ? (progressValue / 100).clamp(0.0, 1.0)
                               : progressValue.clamp(0.0, 1.0);
-
+                          print(project);
                           return Padding(
                             padding: const EdgeInsets.only(
                               bottom: AppSpacing.sm,
