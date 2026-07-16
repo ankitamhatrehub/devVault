@@ -172,7 +172,7 @@ Future<void> _deleteTask(String id) async {
                                     description: task.description,
                                     priority: task.priority,
                                     status: task.status,
-                                   progress: task.progress.toDouble(),
+                                    progress: (task.progress / 100).clamp(0.0, 1.0),
                                     dueDate: task.dueDate,
                                     onTap: () => _openTaskDetail(context, task),
                                   );
