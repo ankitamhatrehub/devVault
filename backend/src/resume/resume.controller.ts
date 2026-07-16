@@ -165,7 +165,7 @@ export const deleteResumeController = async (req: Request, res: Response) => {
   }
 };
 
-// download resume controller
+// download resume controller - returns file bytes, not just URL
 export const downloadResumeController = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.userId;
@@ -196,14 +196,39 @@ export const downloadResumeController = async (req: Request, res: Response) => {
       });
     }
 
+    // Fetch the actual file from Cloudinary URL
+    const fileUrl = data.fileUrl;
+    logger.info(`downloadResumeController: Fetching file from URL: ${fileUrl}`);
+
+    const fileResponse = await fetch(fileUrl);
+
+    if (!fileResponse.ok) {
+      logger.error(
+        `downloadResumeController: Failed to fetch file from Cloudinary - Status: ${fileResponse.status}`,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Failed to download file from storage",
+        data: null,
+      });
+    }
+
+    const fileBuffer = await fileResponse.arrayBuffer();
+    const buffer = Buffer.from(fileBuffer);
+
     logger.info(
-      `downloadResumeController: Resume retrieved successfully for user ${userId}`,
+      `downloadResumeController: Successfully fetched file, size: ${buffer.length} bytes`,
     );
-    return res.status(200).json({
-      success: true,
-      message: "Resume retrieved successfully",
-      data: data,
-    });
+
+    // Return file with proper headers
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${data.fileName}"`,
+    );
+    res.setHeader("Content-Length", buffer.length);
+
+    return res.send(buffer);
   } catch (error) {
     logger.error(
       `downloadResumeController: Exception occurred - ${error instanceof Error ? error.message : String(error)}`,

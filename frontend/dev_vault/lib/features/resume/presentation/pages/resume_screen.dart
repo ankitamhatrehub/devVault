@@ -147,62 +147,39 @@ class _ResumeScreenState extends State<ResumeScreen> {
   Future<void> _downloadResume() async {
     try {
       _safeSetState(() => _isLoading = true);
-      print("📥 Step 1: Starting download via backend...");
+      print("📥 Starting download via backend...");
 
-      // Use backend endpoint to download with authentication
-      print("📥 Step 2: Calling ResumeService.downloadResume()...");
-      await ResumeService.downloadResume();
-      print("✅ Step 3: Backend call successful!");
-
-      // Get file name and save to temp directory
+      // Download file bytes from backend endpoint
+      final dio = Dio();
       final fileName = _resumeData?.fileName ?? 'resume.pdf';
       final tempDir = Directory.systemTemp;
       final filePath = '${tempDir.path}/$fileName';
 
-      print("📁 Step 4: File name: $fileName");
-      print("📁 Step 5: Saving to: $filePath");
+      print("📁 File name: $fileName");
+      print("📁 Saving to: $filePath");
+      print("📥 Downloading from backend...");
 
-      // The backend returns the resume model, now download the file directly
-      print("📁 Step 6: Resume data check:");
-      print("   - fileUrl: ${_resumeData?.fileUrl}");
-      print("   - fileName: ${_resumeData?.fileName}");
-      print("   - fileSize: ${_resumeData?.fileSize}");
-
-      final pdfUrl = _resumeData!.fileUrl;
-      print("📥 Step 7: PDF URL to download: $pdfUrl");
-
-      final dio = Dio();
-      print("📥 Step 8: Starting Dio download...");
-
+      // Download from backend - returns PDF bytes
       await dio.download(
-        pdfUrl,
+        'http://192.168.0.105:3000/api/resume/downloadResume',
         filePath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
             final progress = (received / total * 100).toStringAsFixed(0);
-            print('📊 Download progress: $progress%');
+            print('📊 Progress: $progress%');
           }
         },
       );
 
-      print("✅ Step 9: Dio download complete!");
       _safeSetState(() => _isLoading = false);
 
-      print("✅ Step 10: Download complete!");
+      print("✅ Download complete!");
       _safeShowSnackBar(
         '✅ Downloaded: $fileName\nSaved to: $filePath',
         bgColor: Colors.green,
       );
     } catch (e) {
-      print('❌ Step ERROR: $e');
-      print('❌ Error type: ${e.runtimeType}');
-      if (e is DioException) {
-        print('❌ DioException details:');
-        print('   - Status: ${e.response?.statusCode}');
-        print('   - URL: ${e.requestOptions.path}');
-        print('   - Headers: ${e.requestOptions.headers}');
-        print('   - Response: ${e.response?.data}');
-      }
+      print('❌ Download error: $e');
       _safeSetState(() => _isLoading = false);
       _safeShowSnackBar('Download failed: ${e.toString()}');
     }
