@@ -12,6 +12,7 @@ import projects from "./projects/projects.routes.js";
 import learning from "./learning/learning.routes.js";
 import dashboard from "./dashboard/dashboard.route.js";
 import resume from "./resume/resume.routes.js";
+import aiRoutes from "./ai/ai.routes.js";
 // Create a new Express router instance for handling API routes
 const router = Router();
 
@@ -24,6 +25,9 @@ router.use("/projects", projects);
 router.use("/profile", profile);
 router.use("/dashboard", dashboard);
 router.use("/resume", resume);
+
+
+router.use("/ai", aiRoutes);
 // ========== EXPORTS ==========
 
 // Export the router for use in app.ts

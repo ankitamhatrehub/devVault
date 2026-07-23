@@ -1,3 +1,4 @@
+import 'package:dev_vault/features/ai_chats/ai_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -69,6 +70,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (shouldExit) SystemNavigator.pop();
       },
       child: Scaffold(
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: const Color(0xff8B5CF6),
+          icon: const Icon(Icons.smart_toy, color: Colors.white),
+          label: const Text("AI Chat", style: TextStyle(color: Colors.white)),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AiChatScreen()),
+            );
+          },
+        ),
         body: SafeArea(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())

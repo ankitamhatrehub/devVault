@@ -1,5 +1,5 @@
-// const String baseUrl = "http://192.168.0.105:3000/api/";
-const String baseUrl = "https://devvault-mlld.onrender.com/api/";
+const String baseUrl = "http://192.168.0.105:3000/api/";
+// const String baseUrl = "https://devvault-mlld.onrender.com/api/";
 
 //authentication urls
 const String registerUrl = "${baseUrl}auth/register";
@@ -48,3 +48,8 @@ const String updateResumeUrl = "${baseUrl}resume/updateResume";
 const String deleteResumeUrl = "${baseUrl}resume/deleteResume";
 const String downloadResumeUrl = "${baseUrl}resume/downloadResume";
 const String uploadResumeUrl = "${baseUrl}resume/uploadResume";
+
+
+// ai  urls 
+const String sendAiChatMsgUrl = "${baseUrl}ai/sendChats";
+const String getAiChatMsgUrl = "${baseUrl}ai/getChats";
