@@ -6,7 +6,7 @@ class ResumeCard extends StatelessWidget {
   final String fileType;
   final String fileSize;
   final String uploadDate;
-  final VoidCallback? onPreview;
+  final VoidCallback? onReview;
   final VoidCallback? onDownload;
   final VoidCallback? onReplace;
   final VoidCallback? onDelete;
@@ -16,7 +16,7 @@ class ResumeCard extends StatelessWidget {
     required this.fileType,
     required this.fileSize,
     required this.uploadDate,
-    this.onPreview,
+    this.onReview,
     this.onDownload,
     this.onReplace,
     this.onDelete,
@@ -109,12 +109,12 @@ class ResumeCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // if (onPreview != null)
-                //   _ActionButton(
-                //     icon: Icons.visibility_outlined,
-                //     label: 'Preview',
-                //     onPressed: onPreview!,
-                //   ),
+                if (onReview != null)
+                  _ActionButton(
+                    icon: Icons.visibility_outlined,
+                    label: 'Ai Review',
+                    onPressed: onReview!,
+                  ),
                 if (onDownload != null)
                   _ActionButton(
                     icon: Icons.download_outlined,

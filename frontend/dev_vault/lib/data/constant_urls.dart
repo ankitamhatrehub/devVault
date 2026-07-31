@@ -49,7 +49,6 @@ const String deleteResumeUrl = "${baseUrl}resume/deleteResume";
 const String downloadResumeUrl = "${baseUrl}resume/downloadResume";
 const String uploadResumeUrl = "${baseUrl}resume/uploadResume";
 
-
-// ai  urls 
+// ai  urls
 const String sendAiChatMsgUrl = "${baseUrl}ai/sendChats";
 const String getAiChatMsgUrl = "${baseUrl}ai/getChats";

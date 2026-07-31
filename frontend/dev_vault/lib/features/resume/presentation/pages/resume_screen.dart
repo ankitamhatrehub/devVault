@@ -142,6 +142,16 @@ class _ResumeScreenState extends State<ResumeScreen> {
   //     _safeShowSnackBar('Error: ${e.toString()}');
   //   }
   // }
+  Future<void> _aiReviewResume() async {
+    try {
+      _safeSetState(() => _isLoading = true);
+      print("resume review  by ai ");
+      _safeSetState(() => _isLoading = false);
+    } catch (error) {
+      print(error);
+      throw Exception("error");
+    }
+  }
 
   Future<void> _downloadResume() async {
     try {
@@ -378,7 +388,7 @@ class _ResumeScreenState extends State<ResumeScreen> {
                 fileSize: _resumeData!.fileSize,
                 uploadDate: _formatDate(_resumeData!.uploadedAt),
                 // Preview button disabled - download only
-                onPreview: null,
+                onReview: _isLoading ? null : _aiReviewResume,
                 onDownload: _isLoading ? null : _downloadResume,
                 onReplace: _isLoading ? null : _replaceResume,
                 onDelete: _isLoading ? null : _deleteResume,

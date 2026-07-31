@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { generateResponseService, getAiMsgService } from "./ai.service.js";
+import {
+  generateResponseService,
+  getAiMsgService,
+  // aiReviewResumeService,
+} from "./ai.service.js";
 
 export const sendMessage = async (req: Request, res: Response) => {
   try {
@@ -37,24 +41,52 @@ export const sendMessage = async (req: Request, res: Response) => {
   }
 };
 export const getMessage = async (req: Request, res: Response) => {
-    try {
-        console.log("user id===========================");
-        const userId = (req as any).user?.userId;
-        const getService = await getAiMsgService(userId);
-         return res.status(201).json({
-           success: true,
-             message: "get ai messages successfully",
-           data : getService
-         });
-      
-    } catch (error) {
-        console.log("Controller Error");
+  try {
+    console.log("user id===========================");
+    const userId = (req as any).user?.userId;
+    const getService = await getAiMsgService(userId);
+    return res.status(201).json({
+      success: true,
+      message: "get ai messages successfully",
+      data: getService,
+    });
+  } catch (error) {
+    console.log("Controller Error");
 
-        console.log(error);
+    console.log(error);
 
-        return res.status(500).json({
-            success: false,
-            message: "get messages Internal Server Error",
-        });
-    }
-}
+    return res.status(500).json({
+      success: false,
+      message: "get messages Internal Server Error",
+    });
+  }
+};
+
+/// ai resume review
+
+// export const aiReviewResume = async (req: Request, res: Response) => {
+//   try {
+//     const userId = (req as any).user?.userId;
+
+//     if (!userId) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Unauthorized",
+//       });
+//     }
+
+//     const data = await aiReviewResumeService(userId);
+
+//     return res.status(200).json({
+//       success: true,
+//       data,
+//     });
+//   } catch (error: any) {
+//     console.log(error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
