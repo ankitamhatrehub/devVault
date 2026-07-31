@@ -1,6 +1,6 @@
 # Dev Vault
 
-> Dev Vault is a full-stack developer workspace combining a TypeScript/Node backend and a Flutter frontend app. Build your portfolio, track tasks, manage projects, and organize your learning journey—all in one place.
+> Dev Vault is a full-stack developer workspace combining a TypeScript/Node backend and a Flutter frontend app. It also integrates Google Gemini AI to generate intelligent content through an AI-powered chatbot experience.
 
 ## Contents
 
@@ -22,6 +22,13 @@ For detailed component documentation, see `backend/BACKEND_README.md` and `front
 - **Notes** — Create and organize notes for quick reference
 - **Dashboard** — Overview of your activity, progress, and quick actions
 
+### AI Features
+- 🤖 **AI Career Assistant** — Powered by Google Gemini API for personalized career guidance
+- 📚 **AI Learning Roadmap** — Generates customized learning paths based on user goals and skills
+- 💼 **AI Interview Preparation** — Provides interview questions and preparation guidance
+- 📝 **AI Resume Suggestions** — Helps improve resume content and professional summaries
+- 💡 **AI Notes Assistance** — Generates and refines notes using Google Gemini
+
 ### Recent Additions
 - ✨ **Resume PDF Download** — Download your resume from Cloudinary with backend file proxying
 - 🔒 **Enhanced Security** — Improved Cloudinary integration with proper authorization
@@ -31,6 +38,9 @@ For detailed component documentation, see `backend/BACKEND_README.md` and `front
 
 - **Backend**: Node.js, TypeScript, Express, MongoDB
 - **Frontend**: Flutter (Dart), Provider for state management
+- **AI**: Google Gemini API (Generative AI)
+- **Storage**: Cloudinary
+- **Database**: MongoDB
 - **Storage**: Cloudinary for file uploads
 - **Database**: MongoDB
 
@@ -41,6 +51,7 @@ For detailed component documentation, see `backend/BACKEND_README.md` and `front
 - Flutter SDK (stable)
 - MongoDB (local or cloud)
 - Cloudinary account (for file uploads)
+- Google AI Studio API Key (Gemini API)
 
 ## Quickstart
 
@@ -58,6 +69,9 @@ MONGO_URI=mongodb.....
 # JWT
 JWT_SECRET=your-jwt-secret-key-here.....
 JWT_EXPIRE=30d....
+
+# Google Gemini
+GEMINI_API_KEY=your-gemini-api-key
 
 # Cloudinary
 CLOUDINARY_CLOUD_NAME=your-cloud-name...
@@ -106,6 +120,7 @@ flutter build web
 
 ```
 backend/src/
+├── ai/                 # Google Gemini AI integration
 ├── authentication/      # Auth controller, service, routes
 ├── resume/             # Resume upload/download API
 ├── tasks/              # Task management API
@@ -122,6 +137,7 @@ backend/src/
 frontend/dev_vault/lib/
 ├── data/
 │   ├── services/       # API service layer (ResumeService, TasksService, etc.)
+        ├── ai_service.dart
 │   ├── models/         # Data models
 │   └── constant_urls.dart
 ├── features/
