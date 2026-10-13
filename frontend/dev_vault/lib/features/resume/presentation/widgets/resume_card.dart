@@ -59,7 +59,7 @@ class ResumeCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         fileType,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 13,
                         ),
@@ -92,7 +92,7 @@ class ResumeCard extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           'Uploaded $uploadDate',
-                          style: const TextStyle(
+                          style:  TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 12,
                           ),
@@ -104,7 +104,7 @@ class ResumeCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Divider(color: AppColors.border),
+             Divider(color: AppColors.border),
             const SizedBox(height: AppSpacing.md),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

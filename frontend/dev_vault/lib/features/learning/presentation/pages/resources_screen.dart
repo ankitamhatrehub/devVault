@@ -70,7 +70,7 @@ class ResourcesScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                     Icon(
                       Icons.rocket_launch_rounded,
                       color: AppColors.primary,
                     ),
@@ -114,7 +114,7 @@ class ResourcesScreen extends StatelessWidget {
                                 AppRadius.small,
                               ),
                             ),
-                            child: const Icon(
+                            child:  Icon(
                               Icons.menu_book_rounded,
                               color: AppColors.primary,
                             ),

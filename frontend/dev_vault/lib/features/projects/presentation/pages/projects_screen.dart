@@ -210,7 +210,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   void _showFilterSheet() {
     showModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(
+      shape:  RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppRadius.large),
         ),

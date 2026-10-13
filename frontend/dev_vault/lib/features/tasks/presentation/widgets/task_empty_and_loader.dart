@@ -50,7 +50,7 @@ class EmptyTasksState extends StatelessWidget {
                 color: AppColors.primarySoft,
                 borderRadius: BorderRadius.circular(AppRadius.large),
               ),
-              child: const Icon(
+              child:  Icon(
                 Icons.check_circle_outline_rounded,
                 size: 40,
                 color: AppColors.primary,

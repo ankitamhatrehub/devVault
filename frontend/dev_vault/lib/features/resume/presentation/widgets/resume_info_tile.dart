@@ -41,7 +41,7 @@ class ResumeInfoTile extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
@@ -59,7 +59,7 @@ class ResumeInfoTile extends StatelessWidget {
               ),
             ),
             if (onTap != null)
-              const Icon(
+               Icon(
                 Icons.arrow_forward_ios,
                 size: 14,
                 color: AppColors.textSecondary,

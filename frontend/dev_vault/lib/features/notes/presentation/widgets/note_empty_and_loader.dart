@@ -52,7 +52,7 @@ class EmptyNotesState extends StatelessWidget {
                 color: AppColors.primarySoft,
                 borderRadius: BorderRadius.circular(AppRadius.large),
               ),
-              child: const Icon(
+              child:  Icon(
                 Icons.note_alt_rounded,
                 size: 40,
                 color: AppColors.primary,

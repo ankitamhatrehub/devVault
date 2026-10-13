@@ -11,6 +11,7 @@ import '../../features/onboarding/presentation/pages/splash_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
 import '../../features/resume/presentation/pages/resume_screen.dart';
 import '../../features/tasks/presentation/pages/tasks_screen.dart';
+import '../theme/theme_preview_screen.dart';
 
 class Routes {
   Routes._();
@@ -35,6 +36,7 @@ class Routes {
   static const resources = '/resources';
   static const interviewQuestions = '/interview-questions';
   static const mainShell = '/main-shell';
+  static const themePreview = '/theme-preview';
 }
 
 class AppRouter {
@@ -92,6 +94,11 @@ class AppRouter {
         path: Routes.mainShell,
         name: 'mainShell',
         builder: (context, state) => const MainShell(),
+      ),
+      GoRoute(
+        path: Routes.themePreview,
+        name: 'themePreview',
+        builder: (context, state) => const ThemePreviewScreen(),
       ),
       GoRoute(
         path: Routes.dashboard,

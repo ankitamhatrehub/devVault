@@ -8,13 +8,23 @@ class DevVaultApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'DevVault',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
-      routerConfig: AppRouter.router,
+    return ValueListenableBuilder(
+      valueListenable: AppTheme.variantNotifier,
+      builder: (context, variant, _) {
+        return MaterialApp.router(
+          title: 'DevVault',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.build(variant, Brightness.light),
+          darkTheme: AppTheme.build(variant, Brightness.dark),
+          themeMode: ThemeMode.system,
+          routerConfig: AppRouter.router,
+          builder: (context, child) {
+            AppTheme.currentBrightness =
+                MediaQuery.platformBrightnessOf(context);
+            return child ?? const SizedBox.shrink();
+          },
+        );
+      },
     );
   }
 }

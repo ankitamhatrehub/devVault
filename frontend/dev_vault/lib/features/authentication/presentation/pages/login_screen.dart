@@ -105,7 +105,7 @@ class AuthSuccessScreen extends StatelessWidget {
                   color: AppColors.primarySoft,
                   borderRadius: BorderRadius.circular(AppRadius.large),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_circle_rounded,
                   size: 48,
                   color: AppColors.primary,

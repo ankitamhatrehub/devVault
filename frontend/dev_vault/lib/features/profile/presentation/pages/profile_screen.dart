@@ -114,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     : null,
                                 backgroundColor: AppColors.primarySoft,
                                 child: (_profile?.avatar.isEmpty ?? true)
-                                    ? const Icon(
+                                    ?  Icon(
                                         Icons.person_outline_rounded,
                                         color: AppColors.primary,
                                       )
@@ -126,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 bottom: 0,
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
+                                  decoration:  BoxDecoration(
                                     color: AppColors.primary,
                                     shape: BoxShape.circle,
                                   ),

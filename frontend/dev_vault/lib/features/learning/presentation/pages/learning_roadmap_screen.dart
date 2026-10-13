@@ -166,7 +166,7 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
                       (category) => Chip(
                         label: Text(category),
                         backgroundColor: AppColors.surfaceElevated,
-                        side: const BorderSide(color: AppColors.border),
+                        side:  BorderSide(color: AppColors.border),
                       ),
                     )
                     .toList(),

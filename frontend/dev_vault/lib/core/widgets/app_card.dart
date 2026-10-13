@@ -8,7 +8,7 @@ class AppCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(AppSpacing.md),
     this.margin,
-    this.borderRadius = AppRadius.medium,
+    this.borderRadius,
     this.color,
     this.borderColor,
     this.width,
@@ -19,7 +19,7 @@ class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry? margin;
-  final double borderRadius;
+  final double? borderRadius;
   final Color? color;
   final Color? borderColor;
   final double? width;
@@ -28,16 +28,56 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appStyle = theme.extension<AppStyle>();
+    final effectivePadding =
+        padding == const EdgeInsets.all(AppSpacing.md)
+        ? appStyle?.cardPadding ?? padding
+        : padding;
+    final radius = borderRadius ?? appStyle?.radiusMedium ?? AppRadius.medium;
+    final cardHasBorder =
+        appStyle == null ||
+        appStyle.cardTreatment == AppCardTreatment.border ||
+        appStyle.cardTreatment == AppCardTreatment.flatBorder ||
+        appStyle.cardTreatment == AppCardTreatment.glowBorder;
     return Container(
       width: width,
       height: height,
       alignment: alignment,
       margin: margin,
-      padding: padding,
+      padding: effectivePadding,
       decoration: BoxDecoration(
-        color: color ?? Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: borderColor ?? AppColors.border),
+        color: color ?? theme.cardColor,
+        borderRadius: BorderRadius.circular(radius),
+        border: cardHasBorder
+            ? Border.all(
+                color:
+                    borderColor ??
+                    (appStyle?.cardTreatment == AppCardTreatment.glowBorder
+                        ? theme.colorScheme.secondary
+                        : AppColors.border),
+                width: appStyle?.cardBorderWidth ?? 1,
+              )
+            : null,
+        boxShadow:
+            appStyle == null ||
+                appStyle.cardTreatment == AppCardTreatment.shadow
+            ? [
+                BoxShadow(
+                  color: theme.shadowColor.withValues(alpha: 0.08),
+                  blurRadius: appStyle?.cardElevation ?? 2,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : appStyle.cardTreatment == AppCardTreatment.glowBorder
+            ? [
+                BoxShadow(
+                  color: theme.colorScheme.secondary.withValues(alpha: 0.12),
+                  blurRadius: 14,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
       ),
       child: child,
     );

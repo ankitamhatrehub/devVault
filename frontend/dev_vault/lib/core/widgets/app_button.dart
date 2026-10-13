@@ -42,19 +42,24 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appStyle = theme.extension<AppStyle>();
     final ButtonStyle defaultStyle = ElevatedButton.styleFrom(
       backgroundColor: variant == AppButtonVariant.primary
-          ? Theme.of(context).colorScheme.primary
-          : Theme.of(context).colorScheme.secondaryContainer,
+          ? theme.colorScheme.primary
+          : theme.colorScheme.secondaryContainer,
       foregroundColor: variant == AppButtonVariant.primary
-          ? Theme.of(context).colorScheme.onPrimary
-          : Theme.of(context).colorScheme.onSecondaryContainer,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
+          ? theme.colorScheme.onPrimary
+          : theme.colorScheme.onSecondaryContainer,
+      padding: appStyle?.controlPadding ??
+          const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.sm,
+          ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.large),
+        borderRadius: BorderRadius.circular(
+          appStyle?.buttonRadius ?? AppRadius.large,
+        ),
       ),
       minimumSize: Size(width ?? 64, height ?? 48),
     );

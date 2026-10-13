@@ -49,46 +49,53 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffF7F7FA),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
-        title: const Text(
-          "DevVault AI",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
+        title: Text(
+          'DevVault AI',
+          style:
+              theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ) ??
+              const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
-
       body: Column(
         children: [
           Expanded(
             child: _service.isInitialLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _service.messages.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.smart_toy_outlined,
                           size: 70,
-                          color: Colors.grey,
+                          color: colorScheme.primary.withValues(alpha: 0.75),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Text(
-                          "Start a conversation",
-                          style: TextStyle(
-                            fontSize: 18,
+                          'Start a conversation',
+                          style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
                         Text(
-                          "Ask anything to DevVault AI",
-                          style: TextStyle(color: Colors.grey),
+                          'Ask anything to DevVault AI',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -103,13 +110,11 @@ class _AiChatScreenState extends State<AiChatScreen> {
                     },
                   ),
           ),
-
           if (_service.isLoading) const TypingIndicator(),
-
           MessageInput(
             isLoading: _service.isLoading,
             onSend: (message) async {
-              print("send ai messages");
+              print('send ai messages');
               await _service.sendMessage(message);
             },
           ),

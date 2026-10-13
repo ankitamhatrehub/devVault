@@ -124,7 +124,7 @@ class LearningTile extends StatelessWidget {
                 Chip(
                   label: Text(category),
                   backgroundColor: AppColors.surfaceElevated,
-                  side: const BorderSide(color: AppColors.border),
+                  side:  BorderSide(color: AppColors.border),
                 ),
 
                 Chip(
@@ -171,7 +171,7 @@ class LearningTile extends StatelessWidget {
 
             Row(
               children: [
-                const Icon(
+                 Icon(
                   Icons.calendar_today_outlined,
                   size: 16,
                   color: AppColors.textSecondary,
@@ -188,7 +188,7 @@ class LearningTile extends StatelessWidget {
                   ),
                 ),
 
-                const Icon(
+                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 16,
                   color: AppColors.textSecondary,

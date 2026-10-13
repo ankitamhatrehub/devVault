@@ -35,13 +35,15 @@ class _MessageInputState extends State<MessageInput> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SafeArea(
       top: false,
       child: Container(
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xffEEEEEE))),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
         ),
         child: Row(
           children: [
@@ -52,9 +54,10 @@ class _MessageInputState extends State<MessageInput> {
                 minLines: 1,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  hintText: "Type your message...",
+                  hintText: 'Type your message...',
                   filled: true,
-                  fillColor: const Color(0xffF5F5F7),
+                  fillColor: colorScheme.surfaceContainerHighest,
+                  hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 18,
                     vertical: 14,
@@ -67,30 +70,31 @@ class _MessageInputState extends State<MessageInput> {
                 onSubmitted: (_) => _sendMessage(),
               ),
             ),
-
             const SizedBox(width: 10),
-
             InkWell(
               onTap: widget.isLoading ? null : _sendMessage,
               borderRadius: BorderRadius.circular(100),
               child: Container(
                 width: 52,
                 height: 52,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [Color(0xffB66CFF), Color(0xff8B5CF6)],
+                    colors: [
+                      colorScheme.primary,
+                      colorScheme.primary.withValues(alpha: 0.88),
+                    ],
                   ),
                 ),
                 child: widget.isLoading
-                    ? const Padding(
-                        padding: EdgeInsets.all(14),
+                    ? Padding(
+                        padding: const EdgeInsets.all(14),
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                         ),
                       )
-                    : const Icon(Icons.send_rounded, color: Colors.white),
+                    : Icon(Icons.send_rounded, color: colorScheme.onPrimary),
               ),
             ),
           ],

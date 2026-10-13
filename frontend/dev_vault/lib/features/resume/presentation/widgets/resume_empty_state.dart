@@ -44,7 +44,7 @@ class ResumeEmptyState extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    const Text(
+                     Text(
                       'Supported Format',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
@@ -55,9 +55,9 @@ class ResumeEmptyState extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xs),
                     const Text('✔ PDF'),
                     const SizedBox(height: AppSpacing.md),
-                    const Divider(color: AppColors.border),
+                     Divider(color: AppColors.border),
                     const SizedBox(height: AppSpacing.md),
-                    const Text(
+                     Text(
                       'Maximum Size',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,

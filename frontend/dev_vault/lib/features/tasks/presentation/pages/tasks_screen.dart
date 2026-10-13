@@ -67,7 +67,7 @@ Future<void> _deleteTask(String id) async {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+         SnackBar(
           content: Text("Task deleted successfully"),
           backgroundColor: AppColors.success,
         ),

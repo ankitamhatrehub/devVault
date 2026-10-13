@@ -70,14 +70,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (shouldExit) SystemNavigator.pop();
       },
       child: Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: const Color(0xff8B5CF6),
-          icon: const Icon(Icons.smart_toy, color: Colors.white),
-          label: const Text("AI Chat", style: TextStyle(color: Colors.white)),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AiChatScreen()),
+        floatingActionButton: Builder(
+          builder: (context) {
+            final colorScheme = Theme.of(context).colorScheme;
+            return FloatingActionButton.extended(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              icon: Icon(Icons.smart_toy, color: colorScheme.onPrimary),
+              label: Text(
+                'AI Chat',
+                style:
+                    Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.w600,
+                    ) ??
+                    TextStyle(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AiChatScreen()),
+                );
+              },
             );
           },
         ),

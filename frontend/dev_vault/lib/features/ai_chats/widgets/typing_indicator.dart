@@ -28,6 +28,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
   }
 
   Widget buildDot(double interval) {
+    final primary = Theme.of(context).colorScheme.primary;
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (_, __) {
@@ -37,10 +39,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
           padding: const EdgeInsets.symmetric(horizontal: 2),
           child: Opacity(
             opacity: value,
-            child: const CircleAvatar(
-              radius: 3,
-              backgroundColor: Colors.deepPurple,
-            ),
+            child: CircleAvatar(radius: 3, backgroundColor: primary),
           ),
         );
       },
@@ -49,24 +48,33 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(left: 16, bottom: 12),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 16,
-            backgroundColor: Color(0xffA855F7),
-            child: Icon(Icons.smart_toy, color: Colors.white, size: 18),
+            backgroundColor: colorScheme.secondaryContainer,
+            child: Icon(
+              Icons.smart_toy,
+              color: colorScheme.onSecondaryContainer,
+              size: 18,
+            ),
           ),
-
           const SizedBox(width: 10),
-
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).shadowColor.withValues(alpha: 0.12),
+                  blurRadius: 6,
+                ),
+              ],
             ),
             child: Row(children: [buildDot(0), buildDot(.3), buildDot(.6)]),
           ),

@@ -54,7 +54,7 @@ class UploadProgressCard extends StatelessWidget {
                 value: progress,
                 minHeight: 8,
                 backgroundColor: AppColors.border,
-                valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                valueColor:  AlwaysStoppedAnimation(AppColors.primary),
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -63,13 +63,13 @@ class UploadProgressCard extends StatelessWidget {
               children: [
                 Text(
                   '${(progress * 100).toStringAsFixed(0)}%',
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const Text(
+                 Text(
                   'Uploading...',
                   style: TextStyle(
                     fontSize: 13,

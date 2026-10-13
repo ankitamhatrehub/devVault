@@ -50,7 +50,7 @@ class EmptyProjectsState extends StatelessWidget {
                 color: AppColors.primarySoft,
                 borderRadius: BorderRadius.circular(AppRadius.large),
               ),
-              child: const Icon(
+              child:  Icon(
                 Icons.folder_open_rounded,
                 size: 40,
                 color: AppColors.primary,
