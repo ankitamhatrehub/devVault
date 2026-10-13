@@ -21,6 +21,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
   late final TextEditingController _titleController;
   late final TextEditingController _bodyController;
   bool _pinned = false;
+  bool _isSaving = false;
   String _category = 'Learning';
 
   @override
@@ -40,9 +41,10 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
   }
 
  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+   if (_isSaving || !_formKey.currentState!.validate()) return;
+   setState(() => _isSaving = true);
 
-    try {
+   try {
       if (widget.note == null) {
         // CREATE
         await NotesService.createNote(
@@ -73,6 +75,8 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -92,12 +96,14 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                    child: GlassSurface(
+                      child: StaggeredColumn(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                         AppTextField(
                           controller: _titleController,
                           labelText: 'Title',
+                          textInputAction: TextInputAction.next,
                           validator: (value) =>
                               (value == null || value.trim().isEmpty)
                                   ? 'Title is required.'
@@ -109,6 +115,8 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
                           labelText: 'Note content',
                           maxLines: 5,
                           maxLength: 280,
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => _save(),
                           validator: (value) =>
                               (value == null || value.trim().isEmpty)
                                   ? 'Add the note content.'
@@ -157,7 +165,8 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
                           title: const Text('Pin this note'),
                           contentPadding: EdgeInsets.zero,
                         ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -177,9 +186,9 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
                     child: AppButton.icon(
                       fullWidth: true,
                       variant: AppButtonVariant.primary,
-                      onPressed: _save,
+                      onPressed: _isSaving ? null : _save,
                       icon: const Icon(Icons.save_rounded),
-                      label: const Text('Save note'),
+                      label: Text(_isSaving ? 'Saving note...' : 'Save note'),
                     ),
                   ),
                 ),

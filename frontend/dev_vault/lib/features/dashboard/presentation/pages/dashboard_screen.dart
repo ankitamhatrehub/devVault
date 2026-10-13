@@ -56,7 +56,7 @@ class _DashboardView extends StatelessWidget {
             body: SafeArea(
               child: AnimatedGradientBackground(
                 child: state.isLoading
-                    ? const AppSkeletonList(itemCount: 4)
+                    ? const SizedBox.expand()
                     : state.error != null
                     ? Center(
                         child: Column(
@@ -278,7 +278,7 @@ class _DashboardView extends StatelessWidget {
 Future<bool> _showExitDialog(BuildContext context) async {
   final result = await showDialog<bool>(
     context: context,
-    builder: (context) => AlertDialog(
+    builder: (context) => GlassAlertDialog(
       title: const Text('Exit app'),
       content: const Text('Are you sure you want to exit the app?'),
       actions: [

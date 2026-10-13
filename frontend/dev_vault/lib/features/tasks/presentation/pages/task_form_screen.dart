@@ -132,7 +132,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         if (didPop || !_isDirty) return;
         final shouldLeave = await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (context) => GlassAlertDialog(
             title: const Text('Discard changes?'),
             content: const Text(
               'Your edits will be lost if you leave this screen.',

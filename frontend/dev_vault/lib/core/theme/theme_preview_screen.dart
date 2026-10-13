@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'app_style.dart';
 import 'app_theme.dart';
+import '../widgets/widgets.dart';
 
 class ThemePreviewScreen extends StatefulWidget {
   const ThemePreviewScreen({super.key});
@@ -28,17 +29,21 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
             tooltip: 'Preview bottom sheet',
             onPressed: () => showModalBottomSheet<void>(
               context: context,
+              backgroundColor: Colors.transparent,
               builder: (context) => Padding(
                 padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Bottom sheet', style: theme.textTheme.titleLarge),
-                    const SizedBox(height: 12),
-                    const Text('Shape, surface, and spacing come from this theme.'),
-                    const SizedBox(height: 20),
-                  ],
+                child: GlassSurface(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Bottom sheet', style: theme.textTheme.titleLarge),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Shape, surface, and spacing come from this theme.',
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -87,32 +92,42 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: EdgeInsets.all(16 * style.spacingScale),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Editorial hierarchy', style: theme.textTheme.titleLarge),
-                  const SizedBox(height: 8),
-                  Text(
-                    'A headline and supporting copy demonstrate the typography '
-                    'system.',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: const [
-                      Chip(label: Text('Design')),
-                      Chip(
-                        avatar: Icon(Icons.check_circle_outline, size: 18),
-                        label: Text('Ready'),
-                      ),
-                    ],
-                  ),
-                ],
+          GlassSurface(
+            padding: EdgeInsets.all(16 * style.spacingScale),
+            child: AnimatedSwitcher(
+              duration: MediaQuery.of(context).disableAnimations
+                  ? Duration.zero
+                  : const Duration(milliseconds: 220),
+              child: Padding(
+                key: ValueKey(variant),
+                padding: EdgeInsets.all(16 * style.spacingScale),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Editorial hierarchy',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'A headline and supporting copy demonstrate the typography '
+                      'system.',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: const [
+                        Chip(label: Text('Design')),
+                        Chip(
+                          avatar: Icon(Icons.check_circle_outline, size: 18),
+                          label: Text('Ready'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -148,7 +163,8 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          Card(
+          GlassSurface(
+            padding: EdgeInsets.zero,
             child: Column(
               children: [
                 const ListTile(
@@ -190,7 +206,7 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
               FilledButton.tonal(
                 onPressed: () => showDialog<void>(
                   context: context,
-                  builder: (context) => AlertDialog(
+                  builder: (context) => GlassAlertDialog(
                     title: const Text('Themed dialog'),
                     content: const Text(
                       'Dialog shape, color, and typography follow the selected '
@@ -209,9 +225,15 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
               OutlinedButton.icon(
                 onPressed: () => showModalBottomSheet<void>(
                   context: context,
-                  builder: (context) => const SizedBox(
-                    height: 120,
-                    child: Center(child: Text('Themed bottom sheet')),
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.lg),
+                    child: GlassSurface(
+                      child: SizedBox(
+                        height: 120,
+                        child: Center(child: Text('Themed bottom sheet')),
+                      ),
+                    ),
                   ),
                 ),
                 icon: const Icon(Icons.keyboard_arrow_up),

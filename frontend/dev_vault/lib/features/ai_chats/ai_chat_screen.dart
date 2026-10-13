@@ -116,7 +116,11 @@ class _AiChatViewState extends State<_AiChatView> {
                         itemCount: state.messages.length,
                         reverse: true,
                         itemBuilder: (_, index) {
-                          return MessageBubble(message: state.messages[index]);
+                          return StaggeredListItem(
+                            key: ValueKey(state.messages[index].id),
+                            index: index,
+                            child: MessageBubble(message: state.messages[index]),
+                          );
                         },
                       ),
               ),

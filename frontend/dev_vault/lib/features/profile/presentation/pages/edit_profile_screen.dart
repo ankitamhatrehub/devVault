@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
-import '../../../../data/models/profile_model.dart';
 import '../../../../data/services/profile_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -24,7 +23,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
   bool _isLoading = true;
-  ProfileModel? _profile;
 
   @override
   void initState() {
@@ -68,7 +66,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _companyController.text = profile.currentCompany;
 
       setState(() {
-        _profile = profile;
         _isLoading = false;
       });
     } catch (e) {
@@ -296,15 +293,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: _isSaving ? null : _saveProfile,
-                            child: _isSaving
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
+                            child: AnimatedSwitcher(
+                              duration: MediaQuery.of(context).disableAnimations
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 180),
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      key: ValueKey('saving'),
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Save Changes',
+                                      key: ValueKey('save'),
                                     ),
-                                  )
-                                : const Text('Save Changes'),
+                            ),
                           ),
                         ),
                         const SizedBox(height: AppSpacing.md),

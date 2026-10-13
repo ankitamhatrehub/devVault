@@ -207,7 +207,7 @@ class _AnimatedNavigationIcon extends StatelessWidget {
 Future<bool> _showExitDialog(BuildContext context) async {
   final result = await showDialog<bool>(
     context: context,
-    builder: (context) => AlertDialog(
+    builder: (context) => GlassAlertDialog(
       title: const Text('Exit app'),
       content: const Text('Are you sure you want to exit the app?'),
       actions: [

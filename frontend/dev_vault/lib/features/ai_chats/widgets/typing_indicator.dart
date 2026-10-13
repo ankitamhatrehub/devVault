@@ -10,6 +10,7 @@ class TypingIndicator extends StatefulWidget {
 class _TypingIndicatorState extends State<TypingIndicator>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  bool? _animationsDisabled;
 
   @override
   void initState() {
@@ -18,7 +19,22 @@ class _TypingIndicatorState extends State<TypingIndicator>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
-    )..repeat();
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final animationsDisabled = MediaQuery.of(context).disableAnimations;
+    if (_animationsDisabled == animationsDisabled) return;
+
+    _animationsDisabled = animationsDisabled;
+    if (animationsDisabled) {
+      _controller.stop();
+      _controller.value = 0.5;
+    } else {
+      _controller.repeat();
+    }
   }
 
   @override
@@ -29,6 +45,13 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   Widget buildDot(double interval) {
     final primary = Theme.of(context).colorScheme.primary;
+
+    if (_animationsDisabled == true) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: CircleAvatar(radius: 3, backgroundColor: primary),
+      );
+    }
 
     return AnimatedBuilder(
       animation: _controller,

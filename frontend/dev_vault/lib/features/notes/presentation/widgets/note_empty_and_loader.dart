@@ -12,13 +12,24 @@ class NoteSkeletonList extends StatelessWidget {
 }
 
 class EmptyNotesState extends StatelessWidget {
-  const EmptyNotesState({super.key});
+  const EmptyNotesState({this.isSearchResult = false, super.key});
+
+  final bool isSearchResult;
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: reduceMotion ? 1 : 0.84, end: 1),
+        duration: reduceMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 420),
+        curve: Curves.easeOutBack,
+        builder: (context, scale, child) =>
+            Transform.scale(scale: scale, child: child),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -35,10 +46,15 @@ class EmptyNotesState extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            Text('No notes yet', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              isSearchResult ? 'No matching notes' : 'No notes yet',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'Record important context while it is still fresh.',
+              isSearchResult
+                  ? 'Try another search term to find a note.'
+                  : 'Record important context while it is still fresh.',
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
@@ -46,6 +62,7 @@ class EmptyNotesState extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

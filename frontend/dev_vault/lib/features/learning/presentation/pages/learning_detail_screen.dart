@@ -54,29 +54,27 @@ class _LearningDetailScreenState extends State<LearningDetailScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
+          child: StaggeredColumn(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              SizedBox(
                 width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
-                  borderRadius: BorderRadius.circular(AppRadius.medium),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.learning.title,
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      widget.learning.des,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+                child: GlassSurface(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.learning.title,
+                        style: Theme.of(context).textTheme.headlineLarge,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        widget.learning.des,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -130,9 +128,14 @@ class _LearningDetailScreenState extends State<LearningDetailScreen> {
 
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppRadius.pill),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 8,
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween<double>(begin: 0, end: progress),
+                        duration: MediaQuery.of(context).disableAnimations
+                            ? Duration.zero
+                            : const Duration(milliseconds: 650),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, value, _) =>
+                            LinearProgressIndicator(value: value, minHeight: 8),
                       ),
                     ),
 
@@ -227,7 +230,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreen> {
   void _confirmDelete(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => GlassAlertDialog(
         title: const Text('Delete learning?'),
         content: Text("Delete '${widget.learning.title}' permanently?"),
         actions: [
@@ -256,10 +259,12 @@ class _DetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: child,
+      child: GlassSurface(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: child,
+      ),
     );
   }
 }

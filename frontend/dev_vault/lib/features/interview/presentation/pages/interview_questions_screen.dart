@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class InterviewQuestionsScreen extends StatelessWidget {
   const InterviewQuestionsScreen({super.key});
@@ -59,16 +60,45 @@ class InterviewQuestionsScreen extends StatelessWidget {
                       const SizedBox(height: AppSpacing.sm),
                   itemBuilder: (context, index) {
                     final question = questions[index];
-                    return Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(AppRadius.medium),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                    return StaggeredListItem(
+                      index: index,
+                      child: _QuestionCard(question: question),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _QuestionCard extends StatefulWidget {
+  const _QuestionCard({required this.question});
+
+  final _QuestionItem question;
+
+  @override
+  State<_QuestionCard> createState() => _QuestionCardState();
+}
+
+class _QuestionCardState extends State<_QuestionCard> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final question = widget.question;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.medium),
+        onTap: () => setState(() => _isExpanded = !_isExpanded),
+        child: AppCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
                           Row(
                             children: [
                               Expanded(
@@ -102,15 +132,31 @@ class InterviewQuestionsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: AppColors.textSecondary),
                           ),
+                          AnimatedSize(
+                            duration: MediaQuery.of(context).disableAnimations
+                                ? Duration.zero
+                                : const Duration(milliseconds: 240),
+                            curve: Curves.easeInOut,
+                            child: _isExpanded
+                                ? Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: AppSpacing.md,
+                                    ),
+                                    child: Text(
+                                      'Outline your approach, key trade-offs, and how you would validate the solution.',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: AppColors.textSecondary,
+                                          ),
+                                    ),
+                                  )
+                                : const SizedBox(width: double.infinity),
+                          ),
                         ],
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+                    ),
       ),
     );
   }

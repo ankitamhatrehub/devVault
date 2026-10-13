@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class NoteTile extends StatelessWidget {
   const NoteTile({
@@ -9,6 +11,7 @@ class NoteTile extends StatelessWidget {
     required this.updatedAt,
     required this.pinned,
     required this.onTap,
+    this.heroTag,
     super.key,
   });
 
@@ -18,19 +21,15 @@ class NoteTile extends StatelessWidget {
   final String updatedAt;
   final bool pinned;
   final VoidCallback onTap;
+  final String? heroTag;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(AppRadius.medium),
       onTap: onTap,
-      child: Container(
+      child: AppCard(
         padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(AppRadius.medium),
-          border: Border.all(color: AppColors.border),
-        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,10 +50,21 @@ class NoteTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  heroTag == null
+                      ? Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        )
+                      : Hero(
+                          tag: heroTag!,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Text(
+                              title,
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ),
+                        ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     body,

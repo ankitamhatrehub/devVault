@@ -1,4 +1,3 @@
-
 import 'package:dev_vault/data/models/learning_model.dart';
 
 import 'package:dev_vault/data/services/learning_service.dart';
@@ -19,7 +18,7 @@ class LearningFormScreen extends StatefulWidget {
 
 class _LearningFormScreenState extends State<LearningFormScreen> {
   final _formKey = GlobalKey<FormState>();
-late final TextEditingController _titleController;
+  late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _startDateController;
   late final TextEditingController _targetDateController;
@@ -30,7 +29,7 @@ late final TextEditingController _titleController;
 
   final List<TextEditingController> _stepControllers = [];
 
-@override
+  @override
   void initState() {
     super.initState();
 
@@ -65,7 +64,7 @@ late final TextEditingController _titleController;
     }
   }
 
-@override
+  @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
@@ -79,7 +78,7 @@ late final TextEditingController _titleController;
     super.dispose();
   }
 
-Future<void> _save() async {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
     try {
@@ -129,8 +128,8 @@ Future<void> _save() async {
       SnackBarService.showSuccess(
         context,
         message: widget.learning == null
-          ? 'Learning created successfully'
-          : 'Learning updated successfully',
+            ? 'Learning created successfully'
+            : 'Learning updated successfully',
       );
       Navigator.pop(context, true);
     } catch (e) {
@@ -146,7 +145,9 @@ Future<void> _save() async {
       canPop: true,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.learning == null ? 'Create Learning' : 'Edit Learning'),
+          title: Text(
+            widget.learning == null ? 'Create Learning' : 'Edit Learning',
+          ),
         ),
         body: SafeArea(
           child: Form(
@@ -156,221 +157,226 @@ Future<void> _save() async {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppTextField(
-                          controller: _titleController,
-                          labelText: 'Title',
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Title is required.';
-                            }
-                            if (value.trim().length < 3) {
-                              return 'Title must be at least 3 characters.';
-                            }
-                            if (value.trim().length > 100) {
-                              return 'Title must be less than 100 characters.';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        AppTextField(
-                          controller: _descriptionController,
-                          labelText: 'Description',
-                          maxLines: 4,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Description is required.';
-                            }
-                            if (value.trim().length < 10) {
-                              return 'Description must be at least 10 characters.';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        DropdownButtonFormField<String>(
-                          initialValue: _category,
-                          decoration: const InputDecoration(
-                            labelText: 'Category',
+                    child: GlassSurface(
+                      child: StaggeredColumn(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppTextField(
+                            controller: _titleController,
+                            labelText: 'Title',
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Title is required.';
+                              }
+                              if (value.trim().length < 3) {
+                                return 'Title must be at least 3 characters.';
+                              }
+                              if (value.trim().length > 100) {
+                                return 'Title must be less than 100 characters.';
+                              }
+                              return null;
+                            },
                           ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'Flutter',
-                              child: Text('Flutter'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Node.js',
-                              child: Text('Node.js'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'System Design',
-                              child: Text('System Design'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Docker',
-                              child: Text('Docker'),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() => _category = value);
-                            }
-                          },
-                          validator: (value) =>
-                              (value == null || value.isEmpty)
-                              ? 'Please select a category.'
-                              : null,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        DropdownButtonFormField<String>(
-                          initialValue: _status,
-                          decoration: const InputDecoration(
-                            labelText: 'Status',
+                          const SizedBox(height: AppSpacing.md),
+                          AppTextField(
+                            controller: _descriptionController,
+                            labelText: 'Description',
+                            maxLines: 4,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Description is required.';
+                              }
+                              if (value.trim().length < 10) {
+                                return 'Description must be at least 10 characters.';
+                              }
+                              return null;
+                            },
                           ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'Not Started',
-                              child: Text('Not Started'),
+                          const SizedBox(height: AppSpacing.md),
+                          DropdownButtonFormField<String>(
+                            initialValue: _category,
+                            decoration: const InputDecoration(
+                              labelText: 'Category',
                             ),
-                            DropdownMenuItem(
-                              value: 'In Progress',
-                              child: Text('In Progress'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Completed',
-                              child: Text('Completed'),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() => _status = value);
-                            }
-                          },
-                          validator: (value) =>
-                              (value == null || value.isEmpty)
-                              ? 'Please select a status.'
-                              : null,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        DropdownButtonFormField<String>(
-                          initialValue: _priority,
-                          decoration: const InputDecoration(
-                            labelText: 'Priority',
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Flutter',
+                                child: Text('Flutter'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Node.js',
+                                child: Text('Node.js'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'System Design',
+                                child: Text('System Design'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Docker',
+                                child: Text('Docker'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _category = value);
+                              }
+                            },
+                            validator: (value) =>
+                                (value == null || value.isEmpty)
+                                ? 'Please select a category.'
+                                : null,
                           ),
-                          items: const [
-                            DropdownMenuItem(value: 'Low', child: Text('Low')),
-                            DropdownMenuItem(
-                              value: 'Medium',
-                              child: Text('Medium'),
+                          const SizedBox(height: AppSpacing.md),
+                          DropdownButtonFormField<String>(
+                            initialValue: _status,
+                            decoration: const InputDecoration(
+                              labelText: 'Status',
                             ),
-                            DropdownMenuItem(
-                              value: 'High',
-                              child: Text('High'),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Not Started',
+                                child: Text('Not Started'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'In Progress',
+                                child: Text('In Progress'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Completed',
+                                child: Text('Completed'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _status = value);
+                              }
+                            },
+                            validator: (value) =>
+                                (value == null || value.isEmpty)
+                                ? 'Please select a status.'
+                                : null,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          DropdownButtonFormField<String>(
+                            initialValue: _priority,
+                            decoration: const InputDecoration(
+                              labelText: 'Priority',
                             ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() => _priority = value);
-                            }
-                          },
-                          validator: (value) =>
-                              (value == null || value.isEmpty)
-                              ? 'Please select a priority.'
-                              : null,
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        AppTextField(
-                          controller: _startDateController,
-                          labelText: 'Start Date',
-                          readOnly: true,
-                          onTap: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              firstDate: DateTime(2024),
-                              lastDate: DateTime(2035),
-                              initialDate: DateTime.now(),
-                            );
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Low',
+                                child: Text('Low'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Medium',
+                                child: Text('Medium'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'High',
+                                child: Text('High'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _priority = value);
+                              }
+                            },
+                            validator: (value) =>
+                                (value == null || value.isEmpty)
+                                ? 'Please select a priority.'
+                                : null,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppTextField(
+                            controller: _startDateController,
+                            labelText: 'Start Date',
+                            readOnly: true,
+                            onTap: () async {
+                              final date = await showDatePicker(
+                                context: context,
+                                firstDate: DateTime(2024),
+                                lastDate: DateTime(2035),
+                                initialDate: DateTime.now(),
+                              );
 
-                            if (date != null) {
-                              _startDateController.text = date
-                                  .toIso8601String()
-                                  .split('T')
-                                  .first;
-                            }
-                          },
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                              ? 'Please select a start date.'
-                              : null,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        AppTextField(
-                          controller: _targetDateController,
-                          labelText: 'Target Date',
-                          readOnly: true,
-                          onTap: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              firstDate: DateTime(2024),
-                              lastDate: DateTime(2035),
-                              initialDate: DateTime.now(),
-                            );
+                              if (date != null) {
+                                _startDateController.text = date
+                                    .toIso8601String()
+                                    .split('T')
+                                    .first;
+                              }
+                            },
+                            validator: (value) =>
+                                (value == null || value.trim().isEmpty)
+                                ? 'Please select a start date.'
+                                : null,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          AppTextField(
+                            controller: _targetDateController,
+                            labelText: 'Target Date',
+                            readOnly: true,
+                            onTap: () async {
+                              final date = await showDatePicker(
+                                context: context,
+                                firstDate: DateTime(2024),
+                                lastDate: DateTime(2035),
+                                initialDate: DateTime.now(),
+                              );
 
-                            if (date != null) {
-                              _targetDateController.text = date
-                                  .toIso8601String()
-                                  .split('T')
-                                  .first;
-                            }
-                          },
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                              ? 'Please select a target date.'
-                              : null,
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        Text(
-                          'Learning Steps',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        ...List.generate(
-                          _stepControllers.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: AppTextField(
-                                    controller: _stepControllers[index],
-                                    hintText: 'Step ${index + 1}',
+                              if (date != null) {
+                                _targetDateController.text = date
+                                    .toIso8601String()
+                                    .split('T')
+                                    .first;
+                              }
+                            },
+                            validator: (value) =>
+                                (value == null || value.trim().isEmpty)
+                                ? 'Please select a target date.'
+                                : null,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          Text(
+                            'Learning Steps',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          ...List.generate(
+                            _stepControllers.length,
+                            (index) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: AppTextField(
+                                      controller: _stepControllers[index],
+                                      hintText: 'Step ${index + 1}',
+                                    ),
                                   ),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _stepControllers.removeAt(index);
-                                    });
-                                  },
-                                  icon: const Icon(Icons.delete),
-                                ),
-                              ],
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _stepControllers.removeAt(index);
+                                      });
+                                    },
+                                    icon: const Icon(Icons.delete),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        AppButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              _stepControllers.add(TextEditingController());
-                            });
-                          },
-                          icon: const Icon(Icons.add),
-                          label: const Text("Add Step"),
-                        ),
-                      ],
+                          AppButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _stepControllers.add(TextEditingController());
+                              });
+                            },
+                            icon: const Icon(Icons.add),
+                            label: const Text("Add Step"),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

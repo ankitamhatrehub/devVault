@@ -123,20 +123,24 @@ class _NotesScreenState extends State<NotesScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              AppTextField(
-                controller: _searchController,
-                hintText: 'Search notes',
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: _searchQuery.isEmpty
-                    ? null
-                    : IconButton(
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                onChanged: (value) => setState(() => _searchQuery = value),
+              GlassSurface(
+                padding: EdgeInsets.zero,
+                borderRadius: AppRadius.medium,
+                child: AppTextField(
+                  controller: _searchController,
+                  hintText: 'Search notes',
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: _searchQuery.isEmpty
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                  onChanged: (value) => setState(() => _searchQuery = value),
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               Expanded(
@@ -145,7 +149,9 @@ class _NotesScreenState extends State<NotesScreen> {
                     : RefreshIndicator(
                         onRefresh: _refreshNotes,
                         child: filteredNotes.isEmpty
-                            ? const EmptyNotesState()
+                            ? EmptyNotesState(
+                                isSearchResult: _searchQuery.isNotEmpty,
+                              )
                             : ListView.separated(
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 itemCount: filteredNotes.length,
@@ -153,13 +159,19 @@ class _NotesScreenState extends State<NotesScreen> {
                                     const SizedBox(height: AppSpacing.sm),
                                 itemBuilder: (context, index) {
                                   final note = filteredNotes[index];
-                                  return NoteTile(
-                                    title: note.title,
-                                    body: note.body,
-                                    category: note.category,
-                                    updatedAt: formatDate(note.updatedAt),
-                                    pinned: note.pinned,
-                                    onTap: () => _openNoteDetail(context, note),
+                                  return StaggeredListItem(
+                                    key: ValueKey(note.id),
+                                    index: index,
+                                    child: NoteTile(
+                                      title: note.title,
+                                      body: note.body,
+                                      category: note.category,
+                                      updatedAt: formatDate(note.updatedAt),
+                                      pinned: note.pinned,
+                                      heroTag: 'note-${note.id}',
+                                      onTap: () =>
+                                          _openNoteDetail(context, note),
+                                    ),
                                   );
                                 },
                               ),

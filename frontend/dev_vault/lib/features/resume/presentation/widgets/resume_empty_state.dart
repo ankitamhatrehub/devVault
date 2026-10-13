@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class ResumeEmptyState extends StatelessWidget {
   final VoidCallback onUpload;
@@ -8,10 +9,19 @@ class ResumeEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
     return SingleChildScrollView(
       child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: reduceMotion ? 1 : 0.9, end: 1),
+          duration: reduceMotion
+              ? Duration.zero
+              : const Duration(milliseconds: 420),
+          curve: Curves.easeOutCubic,
+          builder: (context, scale, child) =>
+              Transform.scale(scale: scale, child: child),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -35,13 +45,9 @@ class ResumeEmptyState extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
-              Container(
+              GlassSurface(
                 padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(AppRadius.medium),
-                  border: Border.all(color: AppColors.border),
-                ),
+                borderRadius: AppRadius.medium,
                 child: Column(
                   children: [
                      Text(
@@ -78,6 +84,7 @@ class ResumeEmptyState extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

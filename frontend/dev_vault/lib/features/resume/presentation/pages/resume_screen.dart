@@ -205,7 +205,7 @@ class _ResumeScreenState extends State<ResumeScreen> {
     if (_isDisposed) return;
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (dialogContext) => GlassAlertDialog(
         title: const Text('Replace Resume'),
         content: const Text('Do you want to replace your current resume?'),
         actions: [
@@ -243,7 +243,7 @@ class _ResumeScreenState extends State<ResumeScreen> {
     if (_isDisposed) return;
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (dialogContext) => GlassAlertDialog(
         title: const Text('Delete Resume'),
         content: const Text('Are you sure you want to delete your resume?'),
         actions: [
@@ -354,7 +354,27 @@ class _ResumeScreenState extends State<ResumeScreen> {
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
-            child: _buildContent(),
+            child: AnimatedSwitcher(
+              duration: MediaQuery.of(context).disableAnimations
+                  ? Duration.zero
+                  : const Duration(milliseconds: 280),
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: animation.drive(
+                    Tween<Offset>(
+                      begin: const Offset(0, 0.025),
+                      end: Offset.zero,
+                    ),
+                  ),
+                  child: child,
+                ),
+              ),
+              child: KeyedSubtree(
+                key: ValueKey(_state),
+                child: _buildContent(),
+              ),
+            ),
           ),
         ),
       ),

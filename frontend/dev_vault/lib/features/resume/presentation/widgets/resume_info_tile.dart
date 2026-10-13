@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class ResumeInfoTile extends StatelessWidget {
   final String label;
@@ -17,9 +19,12 @@ class ResumeInfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
+    return GlassSurface(
+      padding: EdgeInsets.zero,
+      borderRadius: AppRadius.medium,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
@@ -65,6 +70,7 @@ class ResumeInfoTile extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
           ],
+        ),
         ),
       ),
     );

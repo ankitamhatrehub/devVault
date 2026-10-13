@@ -17,6 +17,7 @@ class AppTextField extends StatelessWidget {
     this.maxLength,
     this.validator,
     this.onChanged,
+    this.onFieldSubmitted,
     this.onTap,
     this.readOnly = false,
     this.counterText,
@@ -35,6 +36,7 @@ class AppTextField extends StatelessWidget {
   final int? maxLength;
   final String? Function(String?)? validator;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onFieldSubmitted;
   final VoidCallback? onTap;
   final bool readOnly;
   final String? counterText;
@@ -52,6 +54,7 @@ class AppTextField extends StatelessWidget {
         maxLength: maxLength,
         validator: validator,
         onChanged: onChanged,
+        onFieldSubmitted: onFieldSubmitted,
         onTap: onTap,
         readOnly: readOnly,
         textAlign: textAlign,

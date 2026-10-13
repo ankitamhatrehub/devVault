@@ -156,7 +156,7 @@ class TaskDetailScreen extends StatelessWidget {
   void _confirmDelete(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => GlassAlertDialog(
         title: const Text('Delete task?'),
         content: const Text('This task will be removed from your workspace.'),
         actions: [

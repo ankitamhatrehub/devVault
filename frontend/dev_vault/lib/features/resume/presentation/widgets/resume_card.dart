@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class ResumeCard extends StatelessWidget {
   final String fileName;
@@ -25,15 +27,8 @@ class ResumeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppRadius.medium),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
+    return AppCard(
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -70,12 +65,9 @@ class ResumeCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            Container(
+            GlassSurface(
               padding: const EdgeInsets.all(AppSpacing.sm),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(AppRadius.small),
-              ),
+              borderRadius: AppRadius.small,
               child: Row(
                 children: [
                   Expanded(
@@ -138,7 +130,6 @@ class ResumeCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }

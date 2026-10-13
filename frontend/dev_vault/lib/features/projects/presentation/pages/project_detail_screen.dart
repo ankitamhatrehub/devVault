@@ -205,7 +205,7 @@ final ValueChanged<ProjectsModel> onEdit;
   void _confirmDelete(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => GlassAlertDialog(
         title: const Text('Delete project?'),
         content: Text(
           'This will remove ${project.projectName} from your active workspace.',

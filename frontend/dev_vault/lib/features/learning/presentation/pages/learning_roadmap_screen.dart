@@ -1,16 +1,14 @@
-import 'package:dev_vault/core/widgets/app_text_field.dart';
 import 'package:dev_vault/data/models/learning_model.dart';
 import 'package:dev_vault/data/services/learning_service.dart';
 import 'package:dev_vault/features/learning/presentation/widgets/learning_skeleton.dart';
 import 'package:dev_vault/features/learning/presentation/widgets/learning_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'learning_detail_screen.dart';
 import 'learning_form_screen.dart';
 import '../widgets/empty_learning_state.dart';
-import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_service.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class LearningRoadmapScreen extends StatefulWidget {
   const LearningRoadmapScreen({super.key});
@@ -130,30 +128,24 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              AppTextField(
-                controller: _searchController,
-                hintText: "Search roadmap",
-
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: _searchQuery.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          _searchController.clear();
-
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                      ),
-
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
+              GlassSurface(
+                padding: EdgeInsets.zero,
+                borderRadius: AppRadius.medium,
+                child: AppTextField(
+                  controller: _searchController,
+                  hintText: "Search roadmap",
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchQuery.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        ),
+                  onChanged: (value) => setState(() => _searchQuery = value),
+                ),
               ),
 
               const SizedBox(height: AppSpacing.md),
@@ -166,7 +158,7 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
                       (category) => Chip(
                         label: Text(category),
                         backgroundColor: AppColors.surfaceElevated,
-                        side:  BorderSide(color: AppColors.border),
+                        side: BorderSide(color: AppColors.border),
                       ),
                     )
                     .toList(),
@@ -178,7 +170,9 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
                     : RefreshIndicator(
                         onRefresh: _refreshLearnings,
                         child: filteredLearnings.isEmpty
-                            ? const EmptyLearningState()
+                            ? EmptyLearningState(
+                                isSearchResult: _searchQuery.isNotEmpty,
+                              )
                             : ListView.separated(
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 itemCount: filteredLearnings.length,
@@ -197,18 +191,24 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
                                       ? 0.0
                                       : completed / total;
 
-                                  return LearningTile(
-                                    title: learning.title,
-                                    description: learning.des,
-                                    category: learning.category,
-                                    status: learning.status,
-                                    priority: learning.priority,
-                                    progress: progress,
-                                    completedSteps: completed,
-                                    totalSteps: total,
-                                    targetDate: learning.targetDate,
-                                    onTap: () =>
-                                        _openLearningDetail(context, learning),
+                                  return StaggeredListItem(
+                                    key: ValueKey(learning.id),
+                                    index: index,
+                                    child: LearningTile(
+                                      title: learning.title,
+                                      description: learning.des,
+                                      category: learning.category,
+                                      status: learning.status,
+                                      priority: learning.priority,
+                                      progress: progress,
+                                      completedSteps: completed,
+                                      totalSteps: total,
+                                      targetDate: learning.targetDate,
+                                      onTap: () => _openLearningDetail(
+                                        context,
+                                        learning,
+                                      ),
+                                    ),
                                   );
                                 },
                               ),

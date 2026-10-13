@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class ResourcesScreen extends StatelessWidget {
   const ResourcesScreen({super.key});
@@ -97,15 +98,12 @@ class ResourcesScreen extends StatelessWidget {
                       const SizedBox(height: AppSpacing.sm),
                   itemBuilder: (context, index) {
                     final resource = resources[index];
-                    return Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(AppRadius.medium),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        children: [
+                    return StaggeredListItem(
+                      index: index,
+                      child: PressableScale(
+                        child: AppCard(
+                          child: Row(
+                              children: [
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.sm),
                             decoration: BoxDecoration(
@@ -168,7 +166,9 @@ class ResourcesScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                        ],
+                              ],
+                          ),
+                        ),
                       ),
                     );
                   },

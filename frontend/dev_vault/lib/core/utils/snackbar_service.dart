@@ -9,18 +9,25 @@ class SnackBarService {
     required String message,
     Duration duration = const Duration(seconds: 3),
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+            Icon(
+              Icons.check_circle_rounded,
+              color: AppColors.success,
+              size: 20,
+            ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: AppColors.success,
+        backgroundColor: colorScheme.surfaceContainerHigh,
         duration: duration,
         behavior: SnackBarBehavior.floating,
+        elevation: 4,
+        margin: const EdgeInsets.all(AppSpacing.md),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.medium),
         ),
@@ -33,18 +40,21 @@ class SnackBarService {
     required String message,
     Duration duration = const Duration(seconds: 4),
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_rounded, color: Colors.white, size: 20),
+            Icon(Icons.error_rounded, color: AppColors.danger, size: 20),
             const SizedBox(width: AppSpacing.sm),
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: AppColors.danger,
+        backgroundColor: colorScheme.surfaceContainerHigh,
         duration: duration,
         behavior: SnackBarBehavior.floating,
+        elevation: 4,
+        margin: const EdgeInsets.all(AppSpacing.md),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.medium),
         ),
@@ -57,18 +67,21 @@ class SnackBarService {
     required String message,
     Duration duration = const Duration(seconds: 3),
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.info_rounded, color: Colors.white, size: 20),
+            Icon(Icons.info_rounded, color: colorScheme.primary, size: 20),
             const SizedBox(width: AppSpacing.sm),
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: AppColors.primary,
+        backgroundColor: colorScheme.surfaceContainerHigh,
         duration: duration,
         behavior: SnackBarBehavior.floating,
+        elevation: 4,
+        margin: const EdgeInsets.all(AppSpacing.md),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.medium),
         ),
@@ -81,18 +94,21 @@ class SnackBarService {
     required String message,
     Duration duration = const Duration(seconds: 3),
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.warning_rounded, color: Colors.white, size: 20),
+            Icon(Icons.warning_rounded, color: AppColors.warning, size: 20),
             const SizedBox(width: AppSpacing.sm),
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: AppColors.warning,
+        backgroundColor: colorScheme.surfaceContainerHigh,
         duration: duration,
         behavior: SnackBarBehavior.floating,
+        elevation: 4,
+        margin: const EdgeInsets.all(AppSpacing.md),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.medium),
         ),

@@ -19,6 +19,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   ProfileModel? _profile;
   bool _isLoading = true;
+  bool _isUploadingAvatar = false;
 
   @override
   void initState() {
@@ -61,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (image == null) return; // User cancelled
 
-    setState(() => _isLoading = true);
+    setState(() => _isUploadingAvatar = true);
 
     try {
       // 2. Upload using service
@@ -80,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() => _isUploadingAvatar = false);
     }
   }
 
@@ -95,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: _isLoading
               ? const AppSkeletonList(itemCount: 2)
-              : Column(
+              : StaggeredColumn(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
@@ -115,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     : null,
                                 backgroundColor: AppColors.primarySoft,
                                 child: (_profile?.avatar.isEmpty ?? true)
-                                    ?  Icon(
+                                    ? Icon(
                                         Icons.person_outline_rounded,
                                         color: AppColors.primary,
                                       )
@@ -127,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 bottom: 0,
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration:  BoxDecoration(
+                                  decoration: BoxDecoration(
                                     color: AppColors.primary,
                                     shape: BoxShape.circle,
                                   ),
@@ -138,6 +139,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
+                              if (_isUploadingAvatar)
+                                Positioned.fill(
+                                  child: ClipOval(
+                                    child: ColoredBox(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surface
+                                          .withValues(alpha: 0.72),
+                                      child: Center(
+                                        child: SizedBox(
+                                          width: 22,
+                                          height: 22,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -218,7 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () {
                             showDialog<void>(
                               context: context,
-                              builder: (context) => AlertDialog(
+                              builder: (context) => GlassAlertDialog(
                                 title: const Text('Sign out'),
                                 content: const Text(
                                   'Are you sure you want to sign out?',
@@ -261,12 +285,9 @@ class _ProfileSection extends StatelessWidget {
       children: [
         Text(title, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: AppSpacing.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(AppRadius.medium),
-            border: Border.all(color: AppColors.border),
-          ),
+        GlassSurface(
+          padding: EdgeInsets.zero,
+          borderRadius: AppRadius.medium,
           child: Column(children: children),
         ),
       ],

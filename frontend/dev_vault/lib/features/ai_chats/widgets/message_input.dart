@@ -86,15 +86,29 @@ class _MessageInputState extends State<MessageInput> {
                     ],
                   ),
                 ),
-                child: widget.isLoading
-                    ? Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                child: AnimatedSwitcher(
+                  duration: MediaQuery.of(context).disableAnimations
+                      ? Duration.zero
+                      : const Duration(milliseconds: 180),
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: ScaleTransition(scale: animation, child: child),
+                  ),
+                  child: widget.isLoading
+                      ? Padding(
+                          key: const ValueKey('loading'),
+                          padding: const EdgeInsets.all(14),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colorScheme.onPrimary,
+                          ),
+                        )
+                      : Icon(
+                          Icons.send_rounded,
+                          key: const ValueKey('send'),
                           color: colorScheme.onPrimary,
                         ),
-                      )
-                    : Icon(Icons.send_rounded, color: colorScheme.onPrimary),
+                ),
               ),
             ),
           ],
