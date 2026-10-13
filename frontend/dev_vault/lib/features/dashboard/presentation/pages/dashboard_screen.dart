@@ -1,53 +1,30 @@
 import 'package:dev_vault/features/ai_chats/ai_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../data/models/dashboard_model.dart';
-import '../../../../data/services/dashboard_service.dart';
 import '../../../notes/presentation/pages/note_form_screen.dart';
 import '../../../projects/presentation/widgets/project_tile.dart';
+import '../cubit/dashboard_cubit.dart';
 import '../widgets/dashboard_widgets.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => DashboardCubit()..loadDashboard(),
+      child: const _DashboardView(),
+    );
+  }
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
-  DashboardModel? _dashboard;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadDashboardData();
-  }
-
-  Future<void> _loadDashboardData() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
-      final dashboard = await DashboardService.getDashboard();
-      setState(() {
-        _dashboard = dashboard;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print('❌ Error loading dashboard: $e');
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
+class _DashboardView extends StatelessWidget {
+  const _DashboardView();
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
@@ -62,244 +39,254 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        final shouldExit = await _showExitDialog(context);
-        if (shouldExit) SystemNavigator.pop();
-      },
-      child: Scaffold(
-        floatingActionButton: Builder(
-          builder: (context) {
-            final colorScheme = Theme.of(context).colorScheme;
-            return FloatingActionButton.extended(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-              icon: Icon(Icons.smart_toy, color: colorScheme.onPrimary),
-              label: Text(
-                'AI Chat',
-                style:
-                    Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w600,
-                    ) ??
-                    TextStyle(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AiChatScreen()),
+    return BlocBuilder<DashboardCubit, DashboardState>(
+      builder: (context, state) {
+        final dashboard = state.dashboard;
+        final todayFocusProgress =
+            ((dashboard?.todayFocus?['progress'] ?? 0) as num).toDouble();
+
+        return PopScope(
+          canPop: true,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop) return;
+            final shouldExit = await _showExitDialog(context);
+            if (shouldExit) SystemNavigator.pop();
+          },
+          child: Scaffold(
+            floatingActionButton: Builder(
+              builder: (context) {
+                final colorScheme = Theme.of(context).colorScheme;
+                return FloatingActionButton.extended(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  icon: Icon(Icons.smart_toy, color: colorScheme.onPrimary),
+                  label: Text(
+                    'AI Chat',
+                    style:
+                        Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.w600,
+                        ) ??
+                        TextStyle(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AiChatScreen()),
+                    );
+                  },
                 );
               },
-            );
-          },
-        ),
-        body: SafeArea(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Error: $_error'),
-                      const SizedBox(height: AppSpacing.md),
-                      ElevatedButton(
-                        onPressed: _loadDashboardData,
-                        child: const Text('Retry'),
+            ),
+            body: SafeArea(
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : state.error != null
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Error: ${state.error}'),
+                          const SizedBox(height: AppSpacing.md),
+                          ElevatedButton(
+                            onPressed: () =>
+                                context.read<DashboardCubit>().loadDashboard(),
+                            child: const Text('Retry'),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
+                    )
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '${_getGreeting()}, Developer 👋',
-                            style: Theme.of(context).textTheme.headlineLarge,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${_getGreeting()}, Developer 👋',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineLarge,
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                'Track your progress and build amazing things.',
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: AppColors.textSecondary),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            'Track your progress and build amazing things.',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: AppColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      SizedBox(
-                        // height: 140,
-                        child: Column(
-                          children: [
-                            Row(
+                          const SizedBox(height: AppSpacing.lg),
+                          SizedBox(
+                            child: Column(
                               children: [
-                                MetricCard(
-                                  title: 'Active Projects',
-                                  value: '${_dashboard?.activeProjects ?? 0}',
-                                  caption: 'In progress',
-                                  icon: Icons.folder_open_rounded,
-                                  color: AppColors.accent,
+                                Row(
+                                  children: [
+                                    MetricCard(
+                                      title: 'Active Projects',
+                                      value:
+                                          '${dashboard?.activeProjects ?? 0}',
+                                      caption: 'In progress',
+                                      icon: Icons.folder_open_rounded,
+                                      color: AppColors.accent,
+                                    ),
+                                    const SizedBox(width: AppSpacing.sm),
+                                    MetricCard(
+                                      title: 'Learnings',
+                                      value: '${dashboard?.learningCount ?? 0}',
+                                      caption: 'Keep learning',
+                                      icon: Icons.school_rounded,
+                                      color: AppColors.warning,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: AppSpacing.sm),
-                                MetricCard(
-                                  title: 'Learnings',
-                                  value: '${_dashboard?.learningCount ?? 0}',
-                                  caption: 'Keep learning',
-                                  icon: Icons.school_rounded,
-                                  color: AppColors.warning,
+                                Row(
+                                  children: [
+                                    MetricCard(
+                                      title: 'Completed Tasks',
+                                      value:
+                                          '${dashboard?.completedTasks ?? 0}',
+                                      caption: 'Finished',
+                                      icon: Icons.check_circle_rounded,
+                                      color: AppColors.success,
+                                    ),
+                                    const SizedBox(width: AppSpacing.sm),
+                                    MetricCard(
+                                      title: 'Pending Tasks',
+                                      value: '${dashboard?.pendingTasks ?? 0}',
+                                      caption: 'To do',
+                                      icon: Icons.pending_actions_rounded,
+                                      color: AppColors.primary,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                            Row(
-                              children: [
-                                MetricCard(
-                                  title: 'Completed Tasks',
-                                  value: '${_dashboard?.completedTasks ?? 0}',
-                                  caption: 'Finished',
-                                  icon: Icons.check_circle_rounded,
-                                  color: AppColors.success,
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                                MetricCard(
-                                  title: 'Pending Tasks',
-                                  value: '${_dashboard?.pendingTasks ?? 0}',
-                                  caption: 'To do',
-                                  icon: Icons.pending_actions_rounded,
-                                  color: AppColors.primary,
-                                ),
-                              ],
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          GlassCard(
+                            title: 'Today\'s focus',
+                            subtitle:
+                                (dashboard?.todayFocus?['title'] as String?) ??
+                                'No focus set',
+                            trailing: const Text('2h 15m'),
+                            child: LinearProgressIndicator(
+                              value: (todayFocusProgress / 100).clamp(0.0, 1.0),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      GlassCard(
-                        title: 'Today\'s focus',
-                        subtitle:
-                            (_dashboard?.todayFocus?['title'] as String?) ??
-                            'No focus set',
-                        trailing: const Text('2h 15m'),
-                        child: LinearProgressIndicator(
-                          value:
-                              ((((_dashboard?.todayFocus?['progress'] ?? 0)
-                                              as num)
-                                          .toDouble() /
-                                      100)
-                                  .clamp(0, 1)),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      const SectionHeader(title: 'Quick actions'),
-                      const SizedBox(height: AppSpacing.sm),
-                      Wrap(
-                        spacing: AppSpacing.sm,
-                        runSpacing: AppSpacing.sm,
-                        children: [
-                          QuickActionChip(
-                            icon: Icons.create_new_folder_rounded,
-                            label: 'New Project',
-                            onTap: () => context.push(Routes.projects),
                           ),
-                          QuickActionChip(
-                            icon: Icons.add_task_rounded,
-                            label: 'New Task',
-                            onTap: () => context.push(Routes.tasks),
-                          ),
-                          QuickActionChip(
-                            icon: Icons.note_alt_outlined,
-                            label: 'Write note',
-                            onTap: () => _openNoteForm(context),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      const SectionHeader(title: 'Recent projects'),
-                      const SizedBox(height: AppSpacing.sm),
-                      if ((_dashboard?.recentProjects ?? []).isEmpty)
-                        EmptyStateSection(
-                          icon: Icons.folder_outlined,
-                          title: 'No projects yet',
-                          subtitle:
-                              'Start building your portfolio by creating a new project',
-                          actionLabel: 'Create Project',
-                          onAction: () => context.push(Routes.projects),
-                        )
-                      else
-                        ...(_dashboard?.recentProjects ?? []).map((project) {
-                          final progressValue =
-                              ((project['progress'] ?? 0) as num).toDouble();
-                          final normalizedProgress = progressValue > 1
-                              ? (progressValue / 100).clamp(0.0, 1.0)
-                              : progressValue.clamp(0.0, 1.0);
-                          print(project);
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppSpacing.sm,
-                            ),
-                            child: GestureDetector(
-                              onTap: () => context.push(Routes.projects),
-                              child: ProjectTile(
-                                name: project['projectName'] ?? 'Untitled',
-                                status: project['status'] ?? 'In progress',
-                                stack: project['primaryStack'] ?? 'Unknown',
-                                progress: normalizedProgress,
-                                deadline: project['deadline'] ?? '2026-07-28',
+                          const SizedBox(height: AppSpacing.md),
+                          const SectionHeader(title: 'Quick actions'),
+                          const SizedBox(height: AppSpacing.sm),
+                          Wrap(
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.sm,
+                            children: [
+                              QuickActionChip(
+                                icon: Icons.create_new_folder_rounded,
+                                label: 'New Project',
                                 onTap: () => context.push(Routes.projects),
                               ),
-                            ),
-                          );
-                        }),
-                      const SizedBox(height: AppSpacing.lg),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SectionHeader(title: 'Today\'s tasks'),
-                          TextButton(
-                            onPressed: () => context.push(Routes.tasks),
-                            child: const Text('See all'),
+                              QuickActionChip(
+                                icon: Icons.add_task_rounded,
+                                label: 'New Task',
+                                onTap: () => context.push(Routes.tasks),
+                              ),
+                              QuickActionChip(
+                                icon: Icons.note_alt_outlined,
+                                label: 'Write note',
+                                onTap: () => _openNoteForm(context),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: AppSpacing.xl),
+                          const SectionHeader(title: 'Recent projects'),
+                          const SizedBox(height: AppSpacing.sm),
+                          if ((dashboard?.recentProjects ?? []).isEmpty)
+                            EmptyStateSection(
+                              icon: Icons.folder_outlined,
+                              title: 'No projects yet',
+                              subtitle:
+                                  'Start building your portfolio by creating a new project',
+                              actionLabel: 'Create Project',
+                              onAction: () => context.push(Routes.projects),
+                            )
+                          else
+                            ...(dashboard?.recentProjects ?? []).map((project) {
+                              final progressValue =
+                                  ((project['progress'] ?? 0) as num)
+                                      .toDouble();
+                              final normalizedProgress = progressValue > 1
+                                  ? (progressValue / 100).clamp(0.0, 1.0)
+                                  : progressValue.clamp(0.0, 1.0);
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.sm,
+                                ),
+                                child: GestureDetector(
+                                  onTap: () => context.push(Routes.projects),
+                                  child: ProjectTile(
+                                    name: project['projectName'] ?? 'Untitled',
+                                    status: project['status'] ?? 'In progress',
+                                    stack: project['primaryStack'] ?? 'Unknown',
+                                    progress: normalizedProgress,
+                                    deadline:
+                                        project['deadline'] ?? '2026-07-28',
+                                    onTap: () => context.push(Routes.projects),
+                                  ),
+                                ),
+                              );
+                            }),
+                          const SizedBox(height: AppSpacing.lg),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const SectionHeader(title: 'Today\'s tasks'),
+                              TextButton(
+                                onPressed: () => context.push(Routes.tasks),
+                                child: const Text('See all'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          if ((dashboard?.recentTasks ?? []).isEmpty)
+                            TaskPreview()
+                          else ...[
+                            ...(dashboard?.recentTasks ?? []).take(2).map((
+                              task,
+                            ) {
+                              final progressValue =
+                                  ((task['progress'] ?? 0) as num).toDouble();
+                              final normalizedProgress = progressValue > 1
+                                  ? (progressValue / 100).clamp(0.0, 1.0)
+                                  : progressValue.clamp(0.0, 1.0);
+
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.sm,
+                                ),
+                                child: TaskPreview(
+                                  title: task['title'] ?? 'Untitled',
+                                  description: task['description'],
+                                  priority: task['priority'],
+                                  status: task['status'],
+                                  dueDate: task['dueDate'],
+                                  progress: normalizedProgress,
+                                ),
+                              );
+                            }),
+                          ],
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.sm),
-                      if ((_dashboard?.recentTasks ?? []).isEmpty)
-                        TaskPreview()
-                      else ...[
-                        ...(_dashboard?.recentTasks ?? []).take(2).map((task) {
-                          final progressValue = ((task['progress'] ?? 0) as num)
-                              .toDouble();
-                          final normalizedProgress = progressValue > 1
-                              ? (progressValue / 100).clamp(0.0, 1.0)
-                              : progressValue.clamp(0.0, 1.0);
-
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppSpacing.sm,
-                            ),
-                            child: TaskPreview(
-                              title: task['title'] ?? 'Untitled',
-                              description: task['description'],
-                              priority: task['priority'],
-                              status: task['status'],
-                              dueDate: task['dueDate'],
-                              progress: normalizedProgress,
-                            ),
-                          );
-                        }),
-                      ],
-                    ],
-                  ),
-                ),
-        ),
-      ),
+                    ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

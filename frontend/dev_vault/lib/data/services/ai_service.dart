@@ -16,7 +16,6 @@ class AiService {
     return {'Authorization': token != null ? 'Bearer $token' : ''};
   }
 
-
   bool isInitialLoading = false; // Loading chat history
   /// UI Refresh Callback
   VoidCallback? onUpdate;
@@ -128,6 +127,7 @@ class AiService {
   }
 
   Future<void> loadMessages() async {
+    isInitialLoading = true;
     isLoading = true;
     _refresh();
 
@@ -144,11 +144,8 @@ class AiService {
       print(response.data);
 
       if (response.statusCode == 201) {
-        print("====== 01 ");
         messages.clear();
-        print("====== 02 ");
         final List<dynamic> data = response.data["data"];
-        print("====== 03 ");
         messages.addAll(
           data.map(
             (e) => ChatMessageModel(
@@ -159,8 +156,6 @@ class AiService {
             ),
           ),
         );
-
-        print("Loaded ${messages.length} messages");
       }
     } on DioException catch (e) {
       print("========== LOAD ERROR ==========");
@@ -169,6 +164,7 @@ class AiService {
       print(e);
     } finally {
       isLoading = false;
+      isInitialLoading = false;
       _refresh();
     }
   }
