@@ -18,18 +18,43 @@ class _SignupFormState extends State<SignupForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _nameFocusNode = FocusNode();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _confirmPasswordFocusNode = FocusNode();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   @override
+  void initState() {
+    super.initState();
+    _nameFocusNode.addListener(_handleFocusChange);
+    _emailFocusNode.addListener(_handleFocusChange);
+    _passwordFocusNode.addListener(_handleFocusChange);
+    _confirmPasswordFocusNode.addListener(_handleFocusChange);
+  }
+
+  @override
   void dispose() {
+    _nameFocusNode.removeListener(_handleFocusChange);
+    _emailFocusNode.removeListener(_handleFocusChange);
+    _passwordFocusNode.removeListener(_handleFocusChange);
+    _confirmPasswordFocusNode.removeListener(_handleFocusChange);
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _nameFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     super.dispose();
+  }
+
+  void _handleFocusChange() {
+    if (mounted) setState(() {});
   }
 
   String? _validateName(String? value) {
@@ -74,20 +99,44 @@ class _SignupFormState extends State<SignupForm> {
   }
 
   void _showErrorSnackBar(String message) {
+    final colorScheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red.shade600,
+        content: Row(
+          children: [
+            Icon(Icons.error_outline_rounded, color: colorScheme.error),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(color: colorScheme.onInverseSurface),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: colorScheme.inverseSurface,
         duration: const Duration(seconds: 3),
       ),
     );
   }
 
   void _showSuccessSnackBar(String message) {
+    final colorScheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green.shade600,
+        content: Row(
+          children: [
+            Icon(Icons.check_circle_outline_rounded, color: AppColors.success),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(color: colorScheme.onInverseSurface),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: colorScheme.inverseSurface,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -160,95 +209,146 @@ class _SignupFormState extends State<SignupForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+
+    return StaggeredColumn(
+      spacing: AppSpacing.md,
       children: [
-        // Full Name Field
-        TextField(
-          controller: _nameController,
-          enabled: !_isLoading,
-          decoration: const InputDecoration(
-            labelText: 'Full name',
-            prefixIcon: Icon(Icons.person_outline_rounded),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-
-        // Email Field
-        TextField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          enabled: !_isLoading,
-          decoration: const InputDecoration(
-            labelText: 'Work email',
-            prefixIcon: Icon(Icons.email_outlined),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-
-        // Password Field
-        TextField(
-          controller: _passwordController,
-          obscureText: _obscurePassword,
-          enabled: !_isLoading,
-          decoration: InputDecoration(
-            labelText: 'Password',
-            prefixIcon: const Icon(Icons.lock_outline_rounded),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility_off : Icons.visibility,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
+        _animatedField(
+          context,
+          focusNode: _nameFocusNode,
+          child: TextField(
+            controller: _nameController,
+            focusNode: _nameFocusNode,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.next,
+            enabled: !_isLoading,
+            decoration: _inputDecoration(
+              colorScheme,
+              labelText: 'Full name',
+              prefixIcon: const Icon(Icons.person_outline_rounded),
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
-
-        // Confirm Password Field
-        TextField(
-          controller: _confirmPasswordController,
-          obscureText: _obscureConfirmPassword,
-          enabled: !_isLoading,
-          decoration: InputDecoration(
-            labelText: 'Confirm password',
-            prefixIcon: const Icon(Icons.lock_reset_rounded),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscureConfirmPassword
-                    ? Icons.visibility_off
-                    : Icons.visibility,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureConfirmPassword = !_obscureConfirmPassword;
-                });
-              },
+        _animatedField(
+          context,
+          focusNode: _emailFocusNode,
+          child: TextField(
+            controller: _emailController,
+            focusNode: _emailFocusNode,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            enabled: !_isLoading,
+            decoration: _inputDecoration(
+              colorScheme,
+              labelText: 'Work email',
+              prefixIcon: const Icon(Icons.email_outlined),
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
-
-        // Create Account Button
+        _animatedField(
+          context,
+          focusNode: _passwordFocusNode,
+          child: TextField(
+            controller: _passwordController,
+            focusNode: _passwordFocusNode,
+            obscureText: _obscurePassword,
+            textInputAction: TextInputAction.next,
+            enabled: !_isLoading,
+            decoration: _inputDecoration(
+              colorScheme,
+              labelText: 'Password',
+              prefixIcon: const Icon(Icons.lock_outline_rounded),
+              suffixIcon: IconButton(
+                tooltip: _obscurePassword ? 'Show password' : 'Hide password',
+                icon: AnimatedSwitcher(
+                  duration: reduceMotion
+                      ? Duration.zero
+                      : const Duration(milliseconds: 180),
+                  transitionBuilder: (child, animation) =>
+                      ScaleTransition(scale: animation, child: child),
+                  child: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    key: ValueKey(_obscurePassword),
+                  ),
+                ),
+                onPressed: _isLoading
+                    ? null
+                    : () => setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      }),
+              ),
+            ),
+          ),
+        ),
+        _animatedField(
+          context,
+          focusNode: _confirmPasswordFocusNode,
+          child: TextField(
+            controller: _confirmPasswordController,
+            focusNode: _confirmPasswordFocusNode,
+            obscureText: _obscureConfirmPassword,
+            textInputAction: TextInputAction.done,
+            enabled: !_isLoading,
+            onSubmitted: (_) => _handleRegister(),
+            decoration: _inputDecoration(
+              colorScheme,
+              labelText: 'Confirm password',
+              prefixIcon: const Icon(Icons.lock_reset_rounded),
+              suffixIcon: IconButton(
+                tooltip: _obscureConfirmPassword
+                    ? 'Show password'
+                    : 'Hide password',
+                icon: AnimatedSwitcher(
+                  duration: reduceMotion
+                      ? Duration.zero
+                      : const Duration(milliseconds: 180),
+                  transitionBuilder: (child, animation) =>
+                      ScaleTransition(scale: animation, child: child),
+                  child: Icon(
+                    _obscureConfirmPassword
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    key: ValueKey(_obscureConfirmPassword),
+                  ),
+                ),
+                onPressed: _isLoading
+                    ? null
+                    : () => setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      }),
+              ),
+            ),
+          ),
+        ),
         SizedBox(
           width: double.infinity,
           child: AppButton(
             fullWidth: true,
             onPressed: _isLoading ? null : _handleRegister,
-            child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Create account'),
+            child: AnimatedSwitcher(
+              duration: reduceMotion
+                  ? Duration.zero
+                  : const Duration(milliseconds: 180),
+              child: _isLoading
+                  ? SizedBox(
+                      key: const ValueKey('loading'),
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: colorScheme.onPrimary,
+                      ),
+                    )
+                  : const Text(
+                      'Create account',
+                      key: ValueKey('create-account'),
+                    ),
+            ),
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
-
-        // Sign In Link
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -260,6 +360,63 @@ class _SignupFormState extends State<SignupForm> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _animatedField(
+    BuildContext context, {
+    required FocusNode focusNode,
+    required Widget child,
+  }) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return AnimatedContainer(
+      duration: reduceMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 180),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppRadius.medium),
+        boxShadow: focusNode.hasFocus
+            ? [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.14),
+                  blurRadius: 16,
+                  spreadRadius: 1,
+                ),
+              ]
+            : const [],
+      ),
+      child: child,
+    );
+  }
+
+  InputDecoration _inputDecoration(
+    ColorScheme colorScheme, {
+    required String labelText,
+    required Widget prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    final radius = BorderRadius.circular(AppRadius.medium);
+
+    return InputDecoration(
+      labelText: labelText,
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.58),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
+      ),
     );
   }
 }

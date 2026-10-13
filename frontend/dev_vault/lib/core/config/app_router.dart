@@ -48,118 +48,177 @@ class AppRouter {
       GoRoute(
         path: Routes.splash,
         name: 'splash',
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const SplashScreen()),
       ),
       GoRoute(
         path: Routes.onboarding,
         name: 'onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const OnboardingScreen()),
       ),
       GoRoute(
         path: Routes.login,
         name: 'login',
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const LoginScreen()),
       ),
       GoRoute(
         path: Routes.signup,
         name: 'signup',
-        builder: (context, state) => const SignupScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const SignupScreen()),
       ),
       GoRoute(
         path: Routes.forgotPassword,
         name: 'forgotPassword',
-        builder: (context, state) => const ForgotPasswordScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const ForgotPasswordScreen()),
       ),
       GoRoute(
         path: Routes.otpVerification,
         name: 'otpVerification',
-        builder: (context, state) => const OtpVerificationScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const OtpVerificationScreen()),
       ),
       GoRoute(
         path: Routes.resetPassword,
         name: 'resetPassword',
-        builder: (context, state) => const ResetPasswordScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const ResetPasswordScreen()),
       ),
       GoRoute(
         path: Routes.changePassword,
         name: 'changePassword',
-        builder: (context, state) => const ChangePasswordScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const ChangePasswordScreen()),
       ),
       GoRoute(
         path: Routes.success,
         name: 'success',
-        builder: (context, state) => const AuthSuccessScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const AuthSuccessScreen()),
       ),
       GoRoute(
         path: Routes.mainShell,
         name: 'mainShell',
-        builder: (context, state) => const MainShell(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const MainShell()),
       ),
       GoRoute(
         path: Routes.themePreview,
         name: 'themePreview',
-        builder: (context, state) => const ThemePreviewScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const ThemePreviewScreen()),
       ),
       GoRoute(
         path: Routes.dashboard,
         name: 'dashboard',
-        builder: (context, state) => const MainShell(initialIndex: 0),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const MainShell(initialIndex: 0)),
       ),
       GoRoute(
         path: Routes.projects,
         name: 'projects',
-        builder: (context, state) => const MainShell(initialIndex: 1),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const MainShell(initialIndex: 1)),
       ),
       GoRoute(
         path: Routes.notes,
         name: 'notes',
-        builder: (context, state) => const MainShell(initialIndex: 3),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const MainShell(initialIndex: 3)),
       ),
       GoRoute(
         path: Routes.learning,
         name: 'learning',
-        builder: (context, state) => const MainShell(initialIndex: 2),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const MainShell(initialIndex: 2)),
       ),
       GoRoute(
         path: Routes.profile,
         name: 'profile',
-        builder: (context, state) => const MainShell(initialIndex: 4),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const MainShell(initialIndex: 4)),
       ),
       GoRoute(
         path: Routes.editProfile,
         name: 'editProfile',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           print("edit profile screen openinhg");
           final profile = state.extra as ProfileModel?;
           if (profile == null) {
-            return Scaffold(
-              appBar: AppBar(title: const Text('Error')),
-              body: const Center(child: Text('Profile data not found')),
+            return _transitionPage(
+              state,
+              Scaffold(
+                appBar: AppBar(title: const Text('Error')),
+                body: const Center(child: Text('Profile data not found')),
+              ),
             );
           }
-          return EditProfileScreen();
+          return _transitionPage(state, EditProfileScreen());
         },
       ),
       GoRoute(
         path: Routes.resources,
         name: 'resources',
-        builder: (context, state) => const ResourcesScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const ResourcesScreen()),
       ),
       GoRoute(
         path: Routes.interviewQuestions,
         name: 'interviewQuestions',
-        builder: (context, state) => const InterviewQuestionsScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const InterviewQuestionsScreen()),
       ),
       GoRoute(
         path: Routes.tasks,
         name: 'tasks',
-        builder: (context, state) => const TasksScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const TasksScreen()),
       ),
       GoRoute(
         path: Routes.resume,
         name: 'resume',
-        builder: (context, state) => const ResumeScreen(),
+        pageBuilder: (context, state) =>
+            _transitionPage(state, const ResumeScreen()),
       ),
     ],
+  );
+}
+
+CustomTransitionPage<void> _transitionPage(GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 300),
+    reverseTransitionDuration: const Duration(milliseconds: 220),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (MediaQuery.of(context).disableAnimations) return child;
+
+      final curvedAnimation = animation.drive(
+        CurveTween(curve: Curves.easeOutCubic),
+      );
+      final slideAnimation = animation.drive(
+        Tween<Offset>(
+          begin: const Offset(0.025, 0),
+          end: Offset.zero,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
+      );
+      final scaleAnimation = animation.drive(
+        Tween<double>(
+          begin: 0.985,
+          end: 1,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
+      );
+
+      return FadeTransition(
+        opacity: curvedAnimation,
+        child: SlideTransition(
+          position: slideAnimation,
+          child: ScaleTransition(scale: scaleAnimation, child: child),
+        ),
+      );
+    },
   );
 }

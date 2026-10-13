@@ -8,6 +8,8 @@ class DevVaultApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+
     return ValueListenableBuilder(
       valueListenable: AppTheme.variantNotifier,
       builder: (context, variant, _) {
@@ -17,6 +19,10 @@ class DevVaultApp extends StatelessWidget {
           theme: AppTheme.build(variant, Brightness.light),
           darkTheme: AppTheme.build(variant, Brightness.dark),
           themeMode: ThemeMode.system,
+          themeAnimationDuration: reduceMotion
+              ? Duration.zero
+              : const Duration(milliseconds: 250),
+          themeAnimationCurve: Curves.easeInOutCubic,
           routerConfig: AppRouter.router,
           builder: (context, child) {
             AppTheme.currentBrightness =

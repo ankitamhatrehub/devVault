@@ -1,0 +1,14 @@
+Onboarding images are used under the Unsplash License:
+https://unsplash.com/license
+
+developer-workspace.jpg
+Photo by Michel Isamuna
+https://unsplash.com/photos/kL-EAXnMAp0
+
+multi-monitor-workspace.jpg
+Photo by Abu Saeid
+https://unsplash.com/photos/fdGTi4IcaJc
+
+coding-desk.jpg
+Photo by Christopher Gower
+https://unsplash.com/photos/m_HRfLhgABo

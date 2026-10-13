@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../ai_chats/ai_chat_screen.dart';
 import '../../../dashboard/presentation/pages/dashboard_screen.dart';
 import '../../../learning/presentation/pages/learning_roadmap_screen.dart';
@@ -55,6 +56,10 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+
     return PopScope(
       canPop: _currentIndex == 0,
       onPopInvokedWithResult: (didPop, result) async {
@@ -112,27 +117,87 @@ class _MainShellState extends State<MainShell> {
             AppSpacing.md,
             AppSpacing.md,
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.large),
+          child: GlassSurface(
+            padding: EdgeInsets.zero,
+            borderRadius: AppRadius.large,
             child: NavigationBar(
               height: 70,
               selectedIndex: _currentIndex,
-              indicatorColor: AppColors.primarySoft,
-              backgroundColor: Theme.of(context).cardColor,
+              indicatorColor: colorScheme.primaryContainer.withValues(
+                alpha: theme.brightness == Brightness.dark ? 0.72 : 0.82,
+              ),
+              indicatorShape: const StadiumBorder(),
+              backgroundColor: colorScheme.surface.withValues(alpha: 0),
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
               onDestinationSelected: (index) {
                 setState(() => _currentIndex = index);
                 context.go(_tabs[index].route);
               },
               destinations: _tabs
+                  .asMap()
+                  .entries
                   .map(
-                    (tab) => NavigationDestination(
-                      icon: Icon(tab.icon),
-                      label: tab.label,
+                    (entry) => NavigationDestination(
+                      icon: _AnimatedNavigationIcon(
+                        icon: entry.value.icon,
+                        selected: entry.key == _currentIndex,
+                        reduceMotion: reduceMotion,
+                      ),
+                      label: entry.value.label,
                     ),
                   )
                   .toList(),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedNavigationIcon extends StatelessWidget {
+  const _AnimatedNavigationIcon({
+    required this.icon,
+    required this.selected,
+    required this.reduceMotion,
+  });
+
+  final IconData icon;
+  final bool selected;
+  final bool reduceMotion;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return AnimatedScale(
+      scale: selected ? 1.08 : 1,
+      duration: reduceMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      child: AnimatedContainer(
+        duration: reduceMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: colorScheme.primary.withValues(alpha: 0.16),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : const [],
+        ),
+        child: Icon(
+          icon,
+          color: selected
+              ? colorScheme.onPrimaryContainer
+              : colorScheme.onSurfaceVariant,
         ),
       ),
     );

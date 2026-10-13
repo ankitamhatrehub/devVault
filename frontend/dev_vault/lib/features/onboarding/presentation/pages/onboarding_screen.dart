@@ -45,8 +45,11 @@ class _OnboardingViewState extends State<_OnboardingView> {
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+
     return Scaffold(
-      body: SafeArea(
+      body: AnimatedGradientBackground(
+        child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -67,11 +70,7 @@ class _OnboardingViewState extends State<_OnboardingView> {
                         context.read<OnboardingCubit>().skipToEnd(
                           onboardingPages.length,
                         );
-                        _pageController.animateToPage(
-                          onboardingPages.length - 1,
-                          duration: const Duration(milliseconds: 350),
-                          curve: Curves.easeOut,
-                        );
+                        _moveToPage(onboardingPages.length - 1, reduceMotion);
                       },
                       child: const Text('Skip'),
                     ),
@@ -102,12 +101,7 @@ class _OnboardingViewState extends State<_OnboardingView> {
                                     context
                                         .read<OnboardingCubit>()
                                         .previousPage();
-                                    _pageController.previousPage(
-                                      duration: const Duration(
-                                        milliseconds: 300,
-                                      ),
-                                      curve: Curves.easeOut,
-                                    );
+                                    _moveToPage(currentPage - 1, reduceMotion);
                                   },
                                   child: const Text('Back'),
                                 ),
@@ -148,10 +142,7 @@ class _OnboardingViewState extends State<_OnboardingView> {
                                 context.read<OnboardingCubit>().nextPage(
                                   onboardingPages.length,
                                 );
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeOut,
-                                );
+                                _moveToPage(currentPage + 1, reduceMotion);
                               }
                             },
                             child: Text(
@@ -165,22 +156,43 @@ class _OnboardingViewState extends State<_OnboardingView> {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  Text(
-                    page.title,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                    ),
-                    child: Text(
-                      page.description,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
+                  AnimatedSwitcher(
+                    duration: reduceMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) => FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: animation.drive(
+                          Tween<Offset>(
+                            begin: const Offset(0, 0.08),
+                            end: Offset.zero,
+                          ),
+                        ),
+                        child: child,
                       ),
+                    ),
+                    child: Column(
+                      key: ValueKey(currentPage),
+                      children: [
+                        Text(
+                          page.title,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                          ),
+                          child: Text(
+                            page.description,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: AppColors.textSecondary),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -188,8 +200,21 @@ class _OnboardingViewState extends State<_OnboardingView> {
             },
           ),
         ),
+        ),
       ),
     );
+  }
+
+  void _moveToPage(int page, bool reduceMotion) {
+    if (reduceMotion) {
+      _pageController.jumpToPage(page);
+    } else {
+      _pageController.animateToPage(
+        page,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+      );
+    }
   }
 }
 
@@ -205,14 +230,29 @@ class _OnboardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 220,
-            height: 220,
-            decoration: BoxDecoration(
-              color: item.accentColor.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(AppRadius.large),
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.94, end: 1),
+            duration: MediaQuery.of(context).disableAnimations
+                ? Duration.zero
+                : const Duration(milliseconds: 500),
+            curve: Curves.easeOutBack,
+            builder: (context, scale, child) => Transform.scale(
+              scale: scale,
+              child: child,
             ),
-            child: Icon(item.icon, size: 92, color: item.accentColor),
+            child: GlassSurface(
+              padding: EdgeInsets.zero,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.large),
+                child: Image.asset(
+                  item.imagePath,
+                  width: 220,
+                  height: 220,
+                  fit: BoxFit.cover,
+                  semanticLabel: item.imageDescription,
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: AppSpacing.xl),
         ],

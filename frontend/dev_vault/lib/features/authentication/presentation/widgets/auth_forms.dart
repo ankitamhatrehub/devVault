@@ -14,13 +14,13 @@ class ForgotPasswordForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return StaggeredColumn(
+      spacing: AppSpacing.md,
       children: [
         AppTextField(
           labelText: 'Email',
           prefixIcon: const Icon(Icons.email_outlined),
         ),
-        const SizedBox(height: AppSpacing.lg),
         SizedBox(
           width: double.infinity,
           child: AppButton(
@@ -39,7 +39,8 @@ class OtpForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return StaggeredColumn(
+      spacing: AppSpacing.md,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -56,7 +57,6 @@ class OtpForm extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
         SizedBox(
           width: double.infinity,
           child: AppButton(
@@ -65,7 +65,6 @@ class OtpForm extends StatelessWidget {
             child: const Text('Verify code'),
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
         TextButton(
           onPressed: () => context.go(Routes.forgotPassword),
           child: const Text('Resend code'),
@@ -80,20 +79,19 @@ class ResetPasswordForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return StaggeredColumn(
+      spacing: AppSpacing.md,
       children: [
         AppTextField(
           labelText: 'New password',
           prefixIcon: const Icon(Icons.lock_outline_rounded),
           obscureText: true,
         ),
-        const SizedBox(height: AppSpacing.md),
         AppTextField(
           labelText: 'Confirm new password',
           prefixIcon: const Icon(Icons.lock_reset_rounded),
           obscureText: true,
         ),
-        const SizedBox(height: AppSpacing.lg),
         SizedBox(
           width: double.infinity,
           child: AppButton(
@@ -112,26 +110,24 @@ class ChangePasswordForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return StaggeredColumn(
+      spacing: AppSpacing.md,
       children: [
         AppTextField(
           labelText: 'Current password',
           prefixIcon: const Icon(Icons.lock_outline_rounded),
           obscureText: true,
         ),
-        const SizedBox(height: AppSpacing.md),
         AppTextField(
           labelText: 'New password',
           prefixIcon: const Icon(Icons.lock_outline_rounded),
           obscureText: true,
         ),
-        const SizedBox(height: AppSpacing.md),
         AppTextField(
           labelText: 'Confirm password',
           prefixIcon: const Icon(Icons.lock_reset_rounded),
           obscureText: true,
         ),
-        const SizedBox(height: AppSpacing.lg),
         SizedBox(
           width: double.infinity,
           child: AppButton(
