@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/authentication/presentation/pages/login_screen.dart';
@@ -10,6 +11,9 @@ import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/onboarding/presentation/pages/splash_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
 import '../../features/resume/presentation/pages/resume_screen.dart';
+import '../../features/settings/data/settings_repository.dart';
+import '../../features/settings/presentation/cubit/settings_cubit.dart';
+import '../../features/settings/presentation/pages/settings_screen.dart';
 import '../../features/tasks/presentation/pages/tasks_screen.dart';
 import '../theme/theme_preview_screen.dart';
 
@@ -37,6 +41,7 @@ class Routes {
   static const interviewQuestions = '/interview-questions';
   static const mainShell = '/main-shell';
   static const themePreview = '/theme-preview';
+  static const settings = '/settings';
 }
 
 class AppRouter {
@@ -110,6 +115,19 @@ class AppRouter {
         name: 'themePreview',
         pageBuilder: (context, state) =>
             _transitionPage(state, const ThemePreviewScreen()),
+      ),
+      GoRoute(
+        path: Routes.settings,
+        name: 'settings',
+        pageBuilder: (context, state) => _transitionPage(
+          state,
+          BlocProvider(
+            create: (_) =>
+                SettingsCubit(SharedPreferencesSettingsRepository())
+                  ..loadSettings(),
+            child: const SettingsScreen(),
+          ),
+        ),
       ),
       GoRoute(
         path: Routes.dashboard,

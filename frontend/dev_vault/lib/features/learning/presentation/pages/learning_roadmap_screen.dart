@@ -151,13 +151,13 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
               const SizedBox(height: AppSpacing.md),
 
               Wrap(
-                spacing: 0,
+                spacing: 10,
                 runSpacing: 0,
                 children: categories
                     .map(
                       (category) => Chip(
                         label: Text(category),
-                        backgroundColor: AppColors.surfaceElevated,
+                        backgroundColor: AppColors.primarySoft,
                         side: BorderSide(color: AppColors.border),
                       ),
                     )

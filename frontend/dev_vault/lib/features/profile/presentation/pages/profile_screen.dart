@@ -95,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: _isLoading
-              ? const AppSkeletonList(itemCount: 2)
+              ? Center(child: CircularProgressIndicator())
               : StaggeredColumn(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -219,11 +219,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () => context.go(Routes.resume),
                         ),
                         ListTile(
-                          enabled: false,
                           leading: const Icon(Icons.settings_outlined),
                           title: const Text('Settings'),
-                          subtitle: const Text('Coming soon'),
-                          onTap: null,
+                          subtitle: const Text('Appearance and preferences'),
+                          onTap: () => context.push(Routes.settings),
                         ),
                         ListTile(
                           leading: const Icon(Icons.lock_reset_rounded),
