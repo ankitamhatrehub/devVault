@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../ai_chats/ai_chat_screen.dart';
 import '../../../dashboard/presentation/pages/dashboard_screen.dart';
 import '../../../learning/presentation/pages/learning_roadmap_screen.dart';
 import '../../../notes/presentation/pages/notes_screen.dart';
@@ -67,46 +68,73 @@ class _MainShellState extends State<MainShell> {
         if (shouldExit) SystemNavigator.pop();
       },
       child: Scaffold(
+        floatingActionButton: _currentIndex == 0
+            ? FloatingActionButton.extended(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                icon: Icon(
+                  Icons.smart_toy,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+                label: Text(
+                  'AI Chat',
+                  style:
+                      Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontWeight: FontWeight.w600,
+                      ) ??
+                      TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const AiChatScreen()),
+                  );
+                },
+              )
+            : null,
         body: IndexedStack(
-        index: _currentIndex,
-        children: const [
-          DashboardScreen(),
-          ProjectsScreen(),
-          LearningRoadmapScreen(),
-          NotesScreen(),
-          ProfileScreen(),
-        ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.md,
-          0,
-          AppSpacing.md,
-          AppSpacing.md,
+          index: _currentIndex,
+          children: const [
+            DashboardScreen(),
+            ProjectsScreen(),
+            LearningRoadmapScreen(),
+            NotesScreen(),
+            ProfileScreen(),
+          ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.large),
-          child: NavigationBar(
-            height: 70,
-            selectedIndex: _currentIndex,
-            indicatorColor: AppColors.primarySoft,
-            backgroundColor: Theme.of(context).cardColor,
-            onDestinationSelected: (index) {
-              setState(() => _currentIndex = index);
-              context.go(_tabs[index].route);
-            },
-            destinations: _tabs
-                .map(
-                  (tab) => NavigationDestination(
-                    icon: Icon(tab.icon),
-                    label: tab.label,
-                  ),
-                )
-                .toList(),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            0,
+            AppSpacing.md,
+            AppSpacing.md,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.large),
+            child: NavigationBar(
+              height: 70,
+              selectedIndex: _currentIndex,
+              indicatorColor: AppColors.primarySoft,
+              backgroundColor: Theme.of(context).cardColor,
+              onDestinationSelected: (index) {
+                setState(() => _currentIndex = index);
+                context.go(_tabs[index].route);
+              },
+              destinations: _tabs
+                  .map(
+                    (tab) => NavigationDestination(
+                      icon: Icon(tab.icon),
+                      label: tab.label,
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
         ),
       ),
-      )
     );
   }
 }
@@ -118,8 +146,14 @@ Future<bool> _showExitDialog(BuildContext context) async {
       title: const Text('Exit app'),
       content: const Text('Are you sure you want to exit the app?'),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-        TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Exit')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('Exit'),
+        ),
       ],
     ),
   );

@@ -1,4 +1,3 @@
-import 'package:dev_vault/features/ai_chats/ai_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -53,34 +52,6 @@ class _DashboardView extends StatelessWidget {
             if (shouldExit) SystemNavigator.pop();
           },
           child: Scaffold(
-            floatingActionButton: Builder(
-              builder: (context) {
-                final colorScheme = Theme.of(context).colorScheme;
-                return FloatingActionButton.extended(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  icon: Icon(Icons.smart_toy, color: colorScheme.onPrimary),
-                  label: Text(
-                    'AI Chat',
-                    style:
-                        Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
-                        ) ??
-                        TextStyle(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const AiChatScreen()),
-                    );
-                  },
-                );
-              },
-            ),
             body: SafeArea(
               child: state.isLoading
                   ? const Center(child: CircularProgressIndicator())
