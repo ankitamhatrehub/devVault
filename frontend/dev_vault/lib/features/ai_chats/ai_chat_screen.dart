@@ -4,6 +4,8 @@ import 'package:dev_vault/features/ai_chats/widgets/typing_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:dev_vault/core/theme/app_theme.dart';
+import 'package:dev_vault/core/widgets/widgets.dart';
 import 'cubit/ai_chat_cubit.dart';
 
 class AiChatScreen extends StatelessWidget {
@@ -78,7 +80,7 @@ class _AiChatViewState extends State<_AiChatView> {
             children: [
               Expanded(
                 child: state.isInitialLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const _ChatLoadingSkeleton()
                     : state.messages.isEmpty
                     ? Center(
                         child: Column(
@@ -129,6 +131,41 @@ class _AiChatViewState extends State<_AiChatView> {
           ),
         );
       },
+    );
+  }
+}
+
+class _ChatLoadingSkeleton extends StatelessWidget {
+  const _ChatLoadingSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.surfaceContainerHighest;
+
+    Widget message({required bool alignRight, required double width}) {
+      return Align(
+        alignment: alignRight ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          width: width,
+          height: 64,
+          margin: const EdgeInsets.only(bottom: AppSpacing.md),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(AppRadius.medium),
+          ),
+        ),
+      );
+    }
+
+    return ShimmerEffect(
+      child: ListView(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        children: [
+          message(alignRight: false, width: 230),
+          message(alignRight: true, width: 190),
+          message(alignRight: false, width: 270),
+        ],
+      ),
     );
   }
 }

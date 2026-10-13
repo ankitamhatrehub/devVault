@@ -4,6 +4,7 @@ import 'package:dev_vault/data/models/projects_model.dart';
 import 'package:dev_vault/data/services/projects_service.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../../core/utils/snackbar_service.dart';
 import '../widgets/widgets.dart';
 import 'project_detail_screen.dart';
@@ -148,21 +149,29 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              TextField(
-                controller: _searchController,
-                onChanged: (value) => setState(() => _searchQuery = value),
-                decoration: InputDecoration(
-                  hintText: 'Search projects',
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  suffixIcon: _searchQuery.isEmpty
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                          icon: const Icon(Icons.close_rounded),
-                        ),
+              GlassSurface(
+                padding: EdgeInsets.zero,
+                borderRadius: AppRadius.medium,
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) => setState(() => _searchQuery = value),
+                  decoration: InputDecoration(
+                    hintText: 'Search projects',
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: _searchQuery.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.md,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -172,7 +181,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     : RefreshIndicator(
                         onRefresh: _refreshProjects,
                         child: filteredProjects.isEmpty
-                            ? const EmptyProjectsState()
+                            ? EmptyProjectsState(
+                                isSearchResult: _searchQuery.isNotEmpty,
+                              )
                             : ListView.separated(
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 itemCount: filteredProjects.length,
@@ -180,18 +191,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                     const SizedBox(height: AppSpacing.sm),
                                 itemBuilder: (context, index) {
                                   final project = filteredProjects[index];
-                                  return InkWell(
-                                    borderRadius: BorderRadius.circular(
-                                      AppRadius.medium,
-                                    ),
-                                    onTap: () =>
-                                        _openProjectDetail(context, project),
+                                  return StaggeredListItem(
+                                    key: ValueKey(project.id),
+                                    index: index,
                                     child: ProjectTile(
                                       name: project.projectName,
                                       status: project.status,
                                       stack: project.primaryStack,
-                                      progress: project.progress / 100,
+                                      progress: (project.progress / 100).clamp(
+                                        0.0,
+                                        1.0,
+                                      ),
                                       deadline: project.deadline,
+                                      heroTag: 'project-${project.id}',
                                       onTap: () =>
                                           _openProjectDetail(context, project),
                                     ),

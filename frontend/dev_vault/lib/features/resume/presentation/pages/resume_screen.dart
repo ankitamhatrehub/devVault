@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../widgets/resume_empty_state.dart';
 import '../widgets/resume_card.dart';
 import '../widgets/upload_progress_card.dart';
@@ -363,16 +364,7 @@ class _ResumeScreenState extends State<ResumeScreen> {
   Widget _buildContent() {
     switch (_state) {
       case ResumeState.loading:
-        return const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: AppSpacing.md),
-              Text('Loading your resume...'),
-            ],
-          ),
-        );
+        return const AppSkeletonList(itemCount: 1);
 
       case ResumeState.empty:
         return ResumeEmptyState(onUpload: _pickAndUploadResume);

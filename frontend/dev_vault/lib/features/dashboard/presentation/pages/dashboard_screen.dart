@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../notes/presentation/pages/note_form_screen.dart';
 import '../../../projects/presentation/widgets/project_tile.dart';
 import '../cubit/dashboard_cubit.dart';
@@ -53,28 +54,30 @@ class _DashboardView extends StatelessWidget {
           },
           child: Scaffold(
             body: SafeArea(
-              child: state.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : state.error != null
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('Error: ${state.error}'),
-                          const SizedBox(height: AppSpacing.md),
-                          ElevatedButton(
-                            onPressed: () =>
-                                context.read<DashboardCubit>().loadDashboard(),
-                            child: const Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+              child: AnimatedGradientBackground(
+                child: state.isLoading
+                    ? const AppSkeletonList(itemCount: 4)
+                    : state.error != null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Error: ${state.error}'),
+                            const SizedBox(height: AppSpacing.md),
+                            ElevatedButton(
+                              onPressed: () => context
+                                  .read<DashboardCubit>()
+                                  .loadDashboard(),
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        child: StaggeredColumn(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -146,8 +149,17 @@ class _DashboardView extends StatelessWidget {
                                 (dashboard?.todayFocus?['title'] as String?) ??
                                 'No focus set',
                             trailing: const Text('2h 15m'),
-                            child: LinearProgressIndicator(
-                              value: (todayFocusProgress / 100).clamp(0.0, 1.0),
+                            child: TweenAnimationBuilder<double>(
+                              tween: Tween<double>(
+                                begin: 0,
+                                end: (todayFocusProgress / 100).clamp(0.0, 1.0),
+                              ),
+                              duration: MediaQuery.of(context).disableAnimations
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 700),
+                              curve: Curves.easeOutCubic,
+                              builder: (context, progress, _) =>
+                                  LinearProgressIndicator(value: progress),
                             ),
                           ),
                           const SizedBox(height: AppSpacing.md),
@@ -251,12 +263,13 @@ class _DashboardView extends StatelessWidget {
                               );
                             }),
                           ],
-                        ],
+                                  ],
+                                ),
+                              ),
                       ),
                     ),
             ),
-          ),
-        );
+          );
       },
     );
   }

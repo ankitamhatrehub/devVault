@@ -27,12 +27,18 @@ class DashboardCubit extends Cubit<DashboardState> {
   DashboardCubit() : super(const DashboardState());
 
   Future<void> loadDashboard() async {
+    if (isClosed) return;
+
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
       final dashboard = await DashboardService.getDashboard();
+      if (isClosed) return;
+
       emit(state.copyWith(dashboard: dashboard, isLoading: false, error: null));
     } catch (e) {
+      if (isClosed) return;
+
       emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }

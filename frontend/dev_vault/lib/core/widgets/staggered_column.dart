@@ -4,11 +4,13 @@ class StaggeredColumn extends StatefulWidget {
   const StaggeredColumn({
     required this.children,
     this.spacing = 0,
+    this.crossAxisAlignment = CrossAxisAlignment.center,
     super.key,
   });
 
   final List<Widget> children;
   final double spacing;
+  final CrossAxisAlignment crossAxisAlignment;
 
   @override
   State<StaggeredColumn> createState() => _StaggeredColumnState();
@@ -81,6 +83,10 @@ class _StaggeredColumnState extends State<StaggeredColumn>
       );
     }
 
-    return Column(mainAxisSize: MainAxisSize.min, children: children);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: widget.crossAxisAlignment,
+      children: children,
+    );
   }
 }

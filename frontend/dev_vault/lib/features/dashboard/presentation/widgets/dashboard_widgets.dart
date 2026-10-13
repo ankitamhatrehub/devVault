@@ -50,12 +50,7 @@ class MetricCard extends StatelessWidget {
                 child: Icon(icon, color: color, size: 20),
               ),
               const SizedBox(height: AppSpacing.sm),
-              Text(
-                value,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
+              _AnimatedMetricValue(value: value),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 title,
@@ -77,6 +72,31 @@ class MetricCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AnimatedMetricValue extends StatelessWidget {
+  const _AnimatedMetricValue({required this.value});
+
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final target = int.tryParse(value);
+    final textStyle = Theme.of(
+      context,
+    ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
+    if (target == null) return Text(value, style: textStyle);
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: target.toDouble()),
+      duration: MediaQuery.of(context).disableAnimations
+          ? Duration.zero
+          : const Duration(milliseconds: 700),
+      curve: Curves.easeOutCubic,
+      builder: (context, animatedValue, _) =>
+          Text(animatedValue.round().toString(), style: textStyle),
     );
   }
 }

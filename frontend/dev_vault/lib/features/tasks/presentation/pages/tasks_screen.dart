@@ -144,20 +144,24 @@ Future<void> _deleteTask(String id) async {
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              AppTextField(
-                controller: _searchController,
-                hintText: 'Search tasks',
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: _searchQuery.isEmpty
-                    ? null
-                    : IconButton(
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                onChanged: (value) => setState(() => _searchQuery = value),
+              GlassSurface(
+                padding: EdgeInsets.zero,
+                borderRadius: AppRadius.medium,
+                child: AppTextField(
+                  controller: _searchController,
+                  hintText: 'Search tasks',
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: _searchQuery.isEmpty
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                  onChanged: (value) => setState(() => _searchQuery = value),
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               Expanded(
@@ -166,7 +170,9 @@ Future<void> _deleteTask(String id) async {
                     : RefreshIndicator(
                         onRefresh: _refreshTasks,
                         child: filteredTasks.isEmpty
-                            ? const EmptyTasksState()
+                            ? EmptyTasksState(
+                                isSearchResult: _searchQuery.isNotEmpty,
+                              )
                             : ListView.separated(
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 itemCount: filteredTasks.length,
@@ -174,14 +180,22 @@ Future<void> _deleteTask(String id) async {
                                     const SizedBox(height: AppSpacing.sm),
                                 itemBuilder: (context, index) {
                                   final task = filteredTasks[index];
-                                  return TaskTile(
-                                    title: task.title,
-                                    description: task.description,
-                                    priority: task.priority,
-                                    status: task.status,
-                                    progress: (task.progress / 100).clamp(0.0, 1.0),
-                                    dueDate: task.dueDate,
-                                    onTap: () => _openTaskDetail(context, task),
+                                  return StaggeredListItem(
+                                    key: ValueKey(task.id),
+                                    index: index,
+                                    child: TaskTile(
+                                      title: task.title,
+                                      description: task.description,
+                                      priority: task.priority,
+                                      status: task.status,
+                                      progress: (task.progress / 100).clamp(
+                                        0.0,
+                                        1.0,
+                                      ),
+                                      dueDate: task.dueDate,
+                                      onTap: () =>
+                                          _openTaskDetail(context, task),
+                                    ),
                                   );
                                 },
                               ),

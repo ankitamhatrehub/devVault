@@ -8,10 +8,12 @@ class DetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: child,
+      child: GlassSurface(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: child,
+      ),
     );
   }
 }

@@ -1,37 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class NoteSkeletonList extends StatelessWidget {
   const NoteSkeletonList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: 3,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
-      itemBuilder: (context, index) => Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(AppRadius.medium),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(width: 120, height: 12, color: AppColors.border),
-            const SizedBox(height: AppSpacing.sm),
-            Container(
-              width: double.infinity,
-              height: 12,
-              color: AppColors.border,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Container(width: 180, height: 12, color: AppColors.border),
-          ],
-        ),
-      ),
-    );
+    return const AppSkeletonList();
   }
 }
 

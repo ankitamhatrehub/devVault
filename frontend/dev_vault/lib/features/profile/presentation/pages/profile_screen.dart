@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/config/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../../data/models/profile_model.dart';
 import '../../../../data/services/profile_service.dart';
 
@@ -93,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const AppSkeletonList(itemCount: 2)
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

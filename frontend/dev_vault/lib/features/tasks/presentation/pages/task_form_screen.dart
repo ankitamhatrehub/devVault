@@ -168,7 +168,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
+                    child: StaggeredColumn(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextField(

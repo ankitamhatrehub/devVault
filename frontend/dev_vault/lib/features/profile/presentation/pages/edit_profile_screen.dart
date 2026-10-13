@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../../data/models/profile_model.dart';
 import '../../../../data/services/profile_service.dart';
 
@@ -164,7 +165,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       appBar: AppBar(title: const Text('Edit profile')),
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+          ? const AppSkeletonList(itemCount: 2)
             : Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Form(

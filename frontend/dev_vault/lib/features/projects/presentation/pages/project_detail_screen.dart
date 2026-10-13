@@ -18,6 +18,7 @@ final ValueChanged<ProjectsModel> onEdit;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Project details'),
@@ -34,22 +35,25 @@ final ValueChanged<ProjectsModel> onEdit;
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
+          child: StaggeredColumn(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              SizedBox(
                 width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
-                  borderRadius: BorderRadius.circular(AppRadius.medium),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      project.projectName,
-                      style: Theme.of(context).textTheme.headlineLarge,
+                child: GlassSurface(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                    Hero(
+                      tag: 'project-${project.id}',
+                      child: Material(
+                        color: Colors.transparent,
+                        child: Text(
+                          project.projectName,
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
@@ -65,25 +69,32 @@ final ValueChanged<ProjectsModel> onEdit;
                             vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colorScheme.secondaryContainer,
                             borderRadius: BorderRadius.circular(AppRadius.pill),
                           ),
-                          child: Text(project.status),
+                          child: Text(
+                            project.status,
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: colorScheme.onSecondaryContainer,
+                                ),
+                          ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                        project.updatedAt != null
-    ? project.updatedAt!
-          .toLocal()
-          .toString()
-          .split('.')
-          .first
-    : '-',
+                          project.updatedAt != null
+                              ? project.updatedAt!
+                                    .toLocal()
+                                    .toString()
+                                    .split('.')
+                                    .first
+                              : '-',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
                     ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -107,15 +118,23 @@ final ValueChanged<ProjectsModel> onEdit;
                     Row(
                       children: [
                         Expanded(child: Text('Progress')),
-Text('${project.progress}%')
+                        Text('${project.progress}%'),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppRadius.pill),
-                      child: LinearProgressIndicator(
-                        value: project.progress/100,
-                        minHeight: 8,
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween<double>(
+                          begin: 0,
+                          end: (project.progress / 100).clamp(0.0, 1.0),
+                        ),
+                        duration: MediaQuery.of(context).disableAnimations
+                            ? Duration.zero
+                            : const Duration(milliseconds: 700),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, progress, _) =>
+                            LinearProgressIndicator(value: progress, minHeight: 8),
                       ),
                     ),
                   ],
@@ -203,7 +222,7 @@ Text('${project.progress}%')
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('${project.projectName} deleted successfully'),
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
                   duration: const Duration(seconds: 2),
                 ),
               );

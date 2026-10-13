@@ -1,45 +1,34 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class ProjectSkeletonList extends StatelessWidget {
   const ProjectSkeletonList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: 3,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
-      itemBuilder: (context, index) => Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(AppRadius.medium),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(width: 140, height: 16, color: AppColors.border),
-            const SizedBox(height: AppSpacing.sm),
-            Container(width: double.infinity, height: 12, color: AppColors.border),
-            const SizedBox(height: AppSpacing.xs),
-            Container(width: 200, height: 12, color: AppColors.border),
-            const SizedBox(height: AppSpacing.md),
-            Container(width: double.infinity, height: 8, color: AppColors.border),
-          ],
-        ),
-      ),
-    );
+    return const AppSkeletonList();
   }
 }
 
 class EmptyProjectsState extends StatelessWidget {
-  const EmptyProjectsState({super.key});
+  const EmptyProjectsState({this.isSearchResult = false, super.key});
+
+  final bool isSearchResult;
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
     return Center(
-      child: Padding(
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: reduceMotion ? 1 : 0.84, end: 1),
+        duration: reduceMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 420),
+        curve: Curves.easeOutBack,
+        builder: (context, scale, child) =>
+            Transform.scale(scale: scale, child: child),
+        child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -58,12 +47,14 @@ class EmptyProjectsState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'No projects yet',
+              isSearchResult ? 'No matching projects' : 'No projects yet',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'Create a project to capture progress, timelines, and context in one place.',
+              isSearchResult
+                  ? 'Try another search term to find a project.'
+                  : 'Create a project to capture progress, timelines, and context in one place.',
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -72,6 +63,7 @@ class EmptyProjectsState extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
