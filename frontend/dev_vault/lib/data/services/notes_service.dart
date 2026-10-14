@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import '../constant_urls.dart';
 import '../models/notes_model.dart';
+import 'api_client.dart';
 import 'local_storage_service.dart';
 
 class NotesService {
-  static final Dio _dio = Dio();
+  static final Dio _dio = ApiClient.dio;
 
   static Map<String, dynamic> _getAuthHeaders() {
     final token = LocalStorageService.getToken();

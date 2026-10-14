@@ -18,9 +18,6 @@ const app = express();
 // Define the port where the server will listen (from .env or default to 3000)
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB before starting server
-connectDB();
-
 // ========== MIDDLEWARE SETUP ==========
 
 // Middleware: Parse incoming JSON request bodies and limits
@@ -91,12 +88,17 @@ app.use((_req, res) => {
 
 // ========== START SERVER ==========
 
-// Start the Express server and listen on the defined PORT
-app.listen(PORT, () => {
-  console.log(`✅ Server is running on http://localhost:${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`📝 API Documentation: http://localhost:${PORT}/api/docs`);
-});
+// Wait for MongoDB before accepting requests so data APIs cannot race startup.
+const startServer = async () => {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`✅ Server is running on http://localhost:${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    console.log(`📝 API Documentation: http://localhost:${PORT}/api/docs`);
+  });
+};
+
+void startServer();
 
 // Export the Express app for testing or module usage
 export default app;

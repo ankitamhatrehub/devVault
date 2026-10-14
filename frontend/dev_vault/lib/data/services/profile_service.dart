@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 import '../constant_urls.dart';
 import '../models/profile_model.dart';
+import 'api_client.dart';
 import 'local_storage_service.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileService {
-  static final Dio _dio = Dio();
+  static final Dio _dio = ApiClient.dio;
 
   /// Get authorization headers with stored token
   static Map<String, dynamic> _getAuthHeaders() {

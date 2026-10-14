@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../constant_urls.dart';
 import '../models/resume_model.dart';
+import 'api_client.dart';
 import 'local_storage_service.dart';
 
 class ResumeService {
-  static final Dio _dio = Dio();
+  static final Dio _dio = ApiClient.dio;
 
   static Map<String, dynamic> _getAuthHeaders() {
     final token = LocalStorageService.getToken();

@@ -56,7 +56,16 @@ class _DashboardView extends StatelessWidget {
             body: SafeArea(
               child: AnimatedGradientBackground(
                 child: state.isLoading
-                    ? const SizedBox.expand()
+                    ? const Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: AppSpacing.md),
+                            Text('Loading your dashboard...'),
+                          ],
+                        ),
+                      )
                     : state.error != null
                     ? Center(
                         child: Column(

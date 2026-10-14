@@ -19,6 +19,7 @@ class LearningRoadmapScreen extends StatefulWidget {
 
 class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
   bool _isLoading = true;
+  String? _loadError;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -35,6 +36,7 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
     try {
       setState(() {
         _isLoading = true;
+        _loadError = null;
       });
 
       final data = await LearningService.getAllLearning();
@@ -50,6 +52,7 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
 
       setState(() {
         _isLoading = false;
+        _loadError = e.toString();
       });
 
       SnackBarService.showErrorFromException(context, error: e);
@@ -167,6 +170,20 @@ class _LearningRoadmapScreenState extends State<LearningRoadmapScreen> {
               Expanded(
                 child: _isLoading
                     ? const LearningSkeleton()
+                    : _loadError != null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('Unable to load learning roadmaps.'),
+                            const SizedBox(height: AppSpacing.sm),
+                            FilledButton(
+                              onPressed: _loadLearnings,
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      )
                     : RefreshIndicator(
                         onRefresh: _refreshLearnings,
                         child: filteredLearnings.isEmpty

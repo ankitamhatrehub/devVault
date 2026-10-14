@@ -19,6 +19,7 @@ class ProjectsScreen extends StatefulWidget {
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
   bool _isLoading = true;
+  String? _loadError;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   List<ProjectsModel> _projects = [];
@@ -31,7 +32,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   Future<void> _loadProjects() async {
     try {
-      setState(() => _isLoading = true);
+      setState(() {
+        _isLoading = true;
+        _loadError = null;
+      });
 
       final projects = await ProjectsService.getAllProjects();
 
@@ -44,7 +48,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _loadError = e.toString();
+      });
 
       SnackBarService.showErrorFromException(context, error: e);
     }
@@ -178,6 +185,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               Expanded(
                 child: _isLoading
                     ? const ProjectSkeletonList()
+                    : _loadError != null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('Unable to load projects.'),
+                            const SizedBox(height: AppSpacing.sm),
+                            FilledButton(
+                              onPressed: _loadProjects,
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      )
                     : RefreshIndicator(
                         onRefresh: _refreshProjects,
                         child: filteredProjects.isEmpty

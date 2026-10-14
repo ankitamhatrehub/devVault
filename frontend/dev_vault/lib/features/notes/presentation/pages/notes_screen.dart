@@ -20,6 +20,7 @@ class NotesScreen extends StatefulWidget {
 
 class _NotesScreenState extends State<NotesScreen> {
   bool _isLoading = true;
+  String? _loadError;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   late List<NotesModel> notes = [];
@@ -35,6 +36,7 @@ class _NotesScreenState extends State<NotesScreen> {
     try {
       setState(() {
         _isLoading = true;
+        _loadError = null;
       });
 
       final notesData = await NotesService.getAllNotes();
@@ -50,6 +52,7 @@ class _NotesScreenState extends State<NotesScreen> {
 
       setState(() {
         _isLoading = false;
+        _loadError = e.toString();
       });
 
       SnackBarService.showErrorFromException(context, error: e);
@@ -146,6 +149,20 @@ class _NotesScreenState extends State<NotesScreen> {
               Expanded(
                 child: _isLoading
                     ? const NoteSkeletonList()
+                    : _loadError != null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('Unable to load notes.'),
+                            const SizedBox(height: AppSpacing.sm),
+                            FilledButton(
+                              onPressed: _loadNotes,
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      )
                     : RefreshIndicator(
                         onRefresh: _refreshNotes,
                         child: filteredNotes.isEmpty

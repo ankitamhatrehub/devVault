@@ -5,11 +5,12 @@ import 'package:dev_vault/data/services/local_storage_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import 'api_client.dart';
 import '../models/chat_message_model.dart';
 
 class AiService {
   final List<ChatMessageModel> messages = [];
-  static final Dio dio = Dio();
+  static final Dio dio = ApiClient.dio;
   bool isLoading = false;
   static Map<String, dynamic> _getAuthHeaders() {
     final token = LocalStorageService.getToken();

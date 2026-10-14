@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import '../constant_urls.dart';
 import '../models/tasks_model.dart';
+import 'api_client.dart';
 import 'local_storage_service.dart';
 
 class TasksService {
-  static final Dio _dio = Dio();
+  static final Dio _dio = ApiClient.dio;
 
   /// Get authorization headers with stored token
   static Map<String, dynamic> _getAuthHeaders() {

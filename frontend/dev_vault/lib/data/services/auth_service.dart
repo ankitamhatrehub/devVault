@@ -2,10 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import '../constant_urls.dart';
 import '../models/profile_model.dart';
+import 'api_client.dart';
 import 'local_storage_service.dart';
 
 class AuthService {
-  static final Dio _dio = Dio();
+  static final Dio _dio = ApiClient.dio;
 
   /// Initialize Dio client with token from local storage
   static void initializeDio() {
